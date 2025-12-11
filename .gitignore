@@ -1,0 +1,21 @@
+# C# e .NET
+bin/
+obj/
+.vs/
+*.user
+*.pdb
+
+# Node.js e Vue
+node_modules/
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.env.local
+.env.*.local
+
+# Mac OS (Lixo do sistema)
+.DS_Store
+
+# VS Code
+.vscode/

@@ -1,0 +1,6 @@
+@Falabara.WebAPI_HostAddress = http://localhost:5282
+
+GET {{Falabara.WebAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
