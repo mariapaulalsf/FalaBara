@@ -22,5 +22,13 @@ namespace Falabara.Domain.Entities
 
         public virtual ICollection<Complaint> Complaints { get; set; } = new List<Complaint>();
         public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
+
+        protected User() {}
+
+        public User(string email, string passwordHash)
+        {
+            Email = email;
+            PasswordHash = passwordHash;
+        }
     }
 }
