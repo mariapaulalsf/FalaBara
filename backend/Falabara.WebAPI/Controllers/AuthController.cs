@@ -27,9 +27,8 @@ namespace Falabara.WebAPI.Controllers
 
             usuarios.Add(novoUsuario);
 
-            // Retorna o token e dados para o JS salvar no localStorage
             return Ok(new { 
-                token = "token_falso_123456", 
+                token = "123456", 
                 nome = novoUsuario.Nome, 
                 email = novoUsuario.Email 
             });

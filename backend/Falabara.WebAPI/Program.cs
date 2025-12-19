@@ -34,12 +34,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowAll");
-// Em desenvolvimento (especialmente em containers), evitar redirecionar para HTTPS
-// para não depender de certificado confiado/porta HTTPS configurada.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseHttpsRedirection();
-}
+app.UseHttpsRedirection();
 app.MapControllers();
 
 app.Run();
