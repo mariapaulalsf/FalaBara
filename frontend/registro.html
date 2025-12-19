@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FalaBará - Login</title>
+    <title>FalaBará - Registro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -17,20 +17,23 @@
 
     <main>
         <div class="login-container">
+            <h2>Nome:</h2>
+            <input id="nome" type="text">
             <h2>Email:</h2>
             <input id="email" type="email">
             <h2>Senha:</h2>
             <input id="senha" type="password">
-            <h3><a href="#">Esqueci minha senha</a></h3>
+            <h2>Confirmar Senha:</h2>
+            <input id="confirmarSenha" type="password">
             
-            <button onclick="login()">Entrar</button>
-            <h3><a href="registro.html">Criar conta</a></h3>
+            <button onclick="registrar()">Registrar</button>
+            <h3><a href="login.html">Já tenho conta</a></h3>
         </div>
     </main>
 
     <footer>
         <p>©Caio, Maria Paula e Theo</p>
     </footer>
-    <script src="login.js"></script>
+    <script src="registro.js"></script>
 </body>
 </html>

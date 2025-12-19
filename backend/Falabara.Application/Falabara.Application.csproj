@@ -2,6 +2,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Falabara.Domain\Falabara.Domain.csproj" />
+    <ProjectReference Include="..\Falabara.Infrastructure\Falabara.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
   </ItemGroup>
 
   <PropertyGroup>

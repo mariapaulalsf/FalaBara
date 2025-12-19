@@ -1,21 +1,29 @@
 const API_URL = "http://localhost:5282/api";
 
-async function login() {
+async function registrar() {
+    const nome = document.getElementById("nome").value;
     const email = document.getElementById("email").value;
     const senha = document.getElementById("senha").value;
+    const confirmarSenha = document.getElementById("confirmarSenha").value;
 
-    if (!email || !senha) {
+    if (!nome || !email || !senha || !confirmarSenha) {
         alert("Por favor, preencha todos os campos");
         return;
     }
 
+    if (senha !== confirmarSenha) {
+        alert("As senhas não coincidem");
+        return;
+    }
+
     try {
-        const resposta = await fetch(`${API_URL}/auth/login`, {
+        const resposta = await fetch(`${API_URL}/auth/registrar`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
+                nome: nome,
                 email: email,
                 senha: senha
             })
@@ -29,10 +37,10 @@ async function login() {
                 nome: dados.nome,
                 email: dados.email
             }));
-            alert("Login realizado com sucesso!");
+            alert("Registro realizado com sucesso!");
             window.location.href = "index.html";
         } else {
-            alert(dados.mensagem || "Erro ao fazer login");
+            alert(dados.mensagem || "Erro ao registrar");
         }
     } catch (erro) {
         console.error("Erro:", erro);

@@ -9,7 +9,7 @@ namespace Falabara.Domain.Entities
 
         public string Name { get; set; }
 
-        public string Email { get; set; } /
+        public string Email { get; set; }
 
         public string PasswordHash { get; set; }
 
@@ -23,7 +23,7 @@ namespace Falabara.Domain.Entities
         public virtual ICollection<Complaint> Complaints { get; set; } = new List<Complaint>();
         public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
-        protected User() {}
+        public User() {}
 
         public User(string email, string passwordHash)
         {

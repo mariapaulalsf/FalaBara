@@ -1,30 +1,71 @@
 using BCrypt.Net;
+using Falabara.Application.DTOs;
+using Falabara.Domain.Entities;
+using Falabara.Infrastructure.Repositories;
 
-public class AuthService
+namespace Falabara.Application.Services
 {
-    private readonly UserRepository _repository;
-
-    public AuthService(UserRepository repository)
+    public class AuthService
     {
-        _repository = repository;
-    }
+        private readonly UserRepository _repository;
 
-    public LoginResponseDTO Login(LoginDTO dto)
-    {
-        var user = _repository.GetByEmail(dto.Email);
+        public AuthService(UserRepository repository)
+        {
+            _repository = repository;
+        }
 
-        if (user == null)
-            throw new Exception("Usuário ou senha inválidos");
+        public LoginResponseDTO Registrar(RegistroDTO dto)
+        {
+            if (_repository.EmailExiste(dto.Email))
+                throw new Exception("Email já cadastrado");
 
-        bool validPassword = BCrypt.Net.BCrypt.Verify(
-            dto.Password, user.PasswordHash
-        );
+            var senhaHash = BCrypt.Net.BCrypt.HashPassword(dto.Senha);
 
-        if (!validPassword)
-            throw new Exception("Usuário ou senha inválidos");
+            var usuario = new User
+            {
+                Name = dto.Nome,
+                Email = dto.Email,
+                PasswordHash = senhaHash,
+                Type = UserType.Population
+            };
 
-        var token = JwtService.GenerateToken(user);
+            _repository.Add(usuario);
 
-        return new LoginResponseDTO { Token = token };
+            var token = GerarTokenSimples(usuario);
+
+            return new LoginResponseDTO
+            {
+                Token = token,
+                Nome = usuario.Name,
+                Email = usuario.Email
+            };
+        }
+
+        public LoginResponseDTO Login(LoginDTO dto)
+        {
+            var usuario = _repository.GetByEmail(dto.Email);
+
+            if (usuario == null)
+                throw new Exception("Email ou senha inválidos");
+
+            bool senhaValida = BCrypt.Net.BCrypt.Verify(dto.Senha, usuario.PasswordHash);
+
+            if (!senhaValida)
+                throw new Exception("Email ou senha inválidos");
+
+            var token = GerarTokenSimples(usuario);
+
+            return new LoginResponseDTO
+            {
+                Token = token,
+                Nome = usuario.Name,
+                Email = usuario.Email
+            };
+        }
+
+        private string GerarTokenSimples(User usuario)
+        {
+            return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes($"{usuario.Id}:{usuario.Email}:{DateTime.UtcNow.Ticks}"));
+        }
     }
 }
