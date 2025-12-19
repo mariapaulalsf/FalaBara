@@ -4,11 +4,10 @@ using System.Linq;
 
 namespace Falabara.WebAPI.Controllers
 {
-    [Route("api/auth")] // Notei que o teu JS usa /api/auth, então ajustei aqui
+    [Route("api/auth")] 
     [ApiController]
     public class AuthController : ControllerBase
     {
-        // Simulação de banco de dados na memória
         private static List<UsuarioModelo> usuarios = new List<UsuarioModelo>();
 
         [HttpPost("registrar")]
@@ -43,7 +42,6 @@ namespace Falabara.WebAPI.Controllers
 
             if (usuario == null)
             {
-                // Retorna erro 401 se não achar
                 return Unauthorized(new { mensagem = "Email ou senha inválidos." });
             }
 
@@ -55,7 +53,6 @@ namespace Falabara.WebAPI.Controllers
         }
     }
 
-    // Classes auxiliares para funcionar sem precisar de outros arquivos
     public class UsuarioModelo
     {
         public string Nome { get; set; }
