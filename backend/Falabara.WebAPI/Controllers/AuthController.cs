@@ -1,46 +1,78 @@
 using Microsoft.AspNetCore.Mvc;
-using Falabara.Application.DTOs;
-using Falabara.Application.Services;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Falabara.WebAPI.Controllers
 {
+    [Route("api/auth")] // Notei que o teu JS usa /api/auth, então ajustei aqui
     [ApiController]
-    [Route("api/auth")]
     public class AuthController : ControllerBase
     {
-        private readonly AuthService _authService;
-
-        public AuthController(AuthService authService)
-        {
-            _authService = authService;
-        }
+        // Simulação de banco de dados na memória
+        private static List<UsuarioModelo> usuarios = new List<UsuarioModelo>();
 
         [HttpPost("registrar")]
-        public IActionResult Registrar([FromBody] RegistroDTO dto)
+        public IActionResult Registrar([FromBody] RegistroRequest request)
         {
-            try
+            if (usuarios.Any(u => u.Email == request.Email))
             {
-                var resultado = _authService.Registrar(dto);
-                return Ok(resultado);
+                return BadRequest(new { mensagem = "Email já cadastrado." });
             }
-            catch (Exception ex)
+
+            var novoUsuario = new UsuarioModelo
             {
-                return BadRequest(new { mensagem = ex.Message });
-            }
+                Nome = request.Nome,
+                Email = request.Email,
+                Senha = request.Senha
+            };
+
+            usuarios.Add(novoUsuario);
+
+            // Retorna o token e dados para o JS salvar no localStorage
+            return Ok(new { 
+                token = "token_falso_123456", 
+                nome = novoUsuario.Nome, 
+                email = novoUsuario.Email 
+            });
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginDTO dto)
+        public IActionResult Login([FromBody] LoginRequest request)
         {
-            try
+            var usuario = usuarios.FirstOrDefault(u => u.Email == request.Email && u.Senha == request.Senha);
+
+            if (usuario == null)
             {
-                var resultado = _authService.Login(dto);
-                return Ok(resultado);
+                // Retorna erro 401 se não achar
+                return Unauthorized(new { mensagem = "Email ou senha inválidos." });
             }
-            catch (Exception ex)
-            {
-                return BadRequest(new { mensagem = ex.Message });
-            }
+
+            return Ok(new { 
+                token = "token_falso_123456", 
+                nome = usuario.Nome, 
+                email = usuario.Email 
+            });
         }
+    }
+
+    // Classes auxiliares para funcionar sem precisar de outros arquivos
+    public class UsuarioModelo
+    {
+        public string Nome { get; set; }
+        public string Email { get; set; }
+        public string Senha { get; set; }
+    }
+
+    public class LoginRequest
+    {
+        public string Email { get; set; }
+        public string Senha { get; set; }
+    }
+
+    public class RegistroRequest
+    {
+        public string Nome { get; set; }
+        public string Email { get; set; }
+        public string Senha { get; set; }
     }
 }
