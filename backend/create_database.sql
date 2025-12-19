@@ -1,7 +1,5 @@
 CREATE DATABASE falabara_db;
 
-\c falabara_db;
-
 CREATE TABLE "Users" (
     "Id" SERIAL PRIMARY KEY,
     "Name" VARCHAR(200) NOT NULL,
@@ -42,6 +40,3 @@ CREATE TABLE "Comments" (
     FOREIGN KEY ("ComplaintId") REFERENCES "Complaints"("Id")
 );
 
-CREATE INDEX "IX_Complaints_UserId" ON "Complaints"("UserId");
-CREATE INDEX "IX_Comments_UserId" ON "Comments"("UserId");
-CREATE INDEX "IX_Comments_ComplaintId" ON "Comments"("ComplaintId");
