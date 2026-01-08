@@ -20,9 +20,7 @@ namespace Falabara.Domain.Entities
         public string? Department { get; set; } 
         public string? EmployeeName { get; set; } 
 
-        public virtual ICollection<Complaint> Complaints { get; set; } = new List<Complaint>();
-        public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
-
+        public string FoneNumber {get; set;}
         public User() {}
 
         public User(string email, string passwordHash)
