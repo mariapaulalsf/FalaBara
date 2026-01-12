@@ -1,31 +1,43 @@
 using Falabara.Domain.Entities;
-using Falabara.Infrastructure.Data;
+using Falabara.Infrastructure.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace Falabara.Infrastructure.Repositories
 {
-    public class UserRepository
+    public class UserRepository : IUserRepository
     {
-        private readonly AppDbContext _context;
+        private readonly FalabaraContext _context;
 
-        public UserRepository(AppDbContext context)
+        public UserRepository(FalabaraContext context)
         {
             _context = context;
         }
 
-        public User? GetByEmail(string email)
+        public async Task AddAsync(User user)
         {
-            return _context.Users.FirstOrDefault(u => u.Email == email);
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
         }
 
-        public void Add(User usuario)
+        public async Task<User> GetByCpfAsync(string cpf)
         {
-            _context.Users.Add(usuario);
-            _context.SaveChanges();
+            return await _context.Users.FirstOrDefaultAsync(u => u.Cpf == cpf);
         }
 
-        public bool EmailExiste(string email)
+        public async Task<User> GetByEmailAsync(string email)
         {
-            return _context.Users.Any(u => u.Email == email);
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        }
+
+        public async Task<User> GetByIdAsync(Guid id)
+        {
+            return await _context.Users.FindAsync(id);
+        }
+
+        public async Task UpdateAsync(User user)
+        {
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
         }
     }
 }
