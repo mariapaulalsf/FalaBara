@@ -55,6 +55,11 @@ namespace Falabara.Domain.Entities
             Department = department;
             FoneNumber = foneNumber;
         }
+        public void SetEmail(string newEmail)
+        {
+            if (string.IsNullOrEmpty(newEmail)) throw new Exception("O email não pode ser vazio.");
+            Email = newEmail;
+        }
         public void SetPassword(string password)
         {
             byte[] salt = new byte[128 / 8];
