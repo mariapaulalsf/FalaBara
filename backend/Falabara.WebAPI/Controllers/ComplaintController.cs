@@ -92,7 +92,7 @@ namespace Falabara.WebAPI.Controllers
             }
         }
 
-        // GET: api/complaints/{id} (Detalhes)
+        // GET: api/complaints/{id} 
         [HttpGet("get/{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {

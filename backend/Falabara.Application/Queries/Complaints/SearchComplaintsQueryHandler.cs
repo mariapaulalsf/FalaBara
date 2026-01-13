@@ -40,12 +40,13 @@ namespace Falabara.Application.Queries.Complaint
                 -- Tradução da Categoria (Simplificado)
                 CASE 
                     WHEN c.""Category"" = 0 THEN 'Saúde'
-                    WHEN c.""Category"" = 1 THEN 'Obras'
+                    WHEN c.""Category"" = 1 THEN 'Obras/Infraestrutura'
                     WHEN c.""Category"" = 2 THEN 'Trânsito'
                     WHEN c.""Category"" = 3 THEN 'Iluminação'
                     WHEN c.""Category"" = 4 THEN 'Limpeza'
                     WHEN c.""Category"" = 5 THEN 'Segurança'
                     WHEN c.""Category"" = 6 THEN 'Educação'
+                    WHEN c.""Category"" = 7 THEN 'Meio Ambiente'
                     ELSE 'Outros'
                 END as CategoryName,
 
