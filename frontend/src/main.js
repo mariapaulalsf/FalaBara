@@ -12,7 +12,8 @@ import 'vue-toastification/dist/index.css'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-import './libs/axios' 
+import './libs/axios'
+import './libs/validations'
 
 Vue.use(VueCompositionAPI)
 Vue.use(BootstrapVue)
