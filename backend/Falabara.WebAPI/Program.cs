@@ -10,6 +10,7 @@ using System.Text;
 using Microsoft.OpenApi.Models; 
 using Npgsql; 
 using System.Data;
+using Microsoft.CodeAnalysis.CodeStyle;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,7 @@ builder.Services.AddDbContext<FalabaraContext>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IComplaintRepository, ComplaintRepository>();
 builder.Services.AddScoped<IVoteRepository, VoteRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<TokenService>(); 
 
 //MEDIATOR
