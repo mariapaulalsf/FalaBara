@@ -12,6 +12,9 @@ namespace Falabara.Infrastructure.Context
         public DbSet<Complaint> Complaints { get; set; }
         public DbSet<Vote> Votes { get; set; }
 
+        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<Feedback> Feedbacks { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

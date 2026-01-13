@@ -36,5 +36,10 @@ namespace Falabara.Infrastructure.Repositories
             _context.Votes.Update(vote);
             await _context.SaveChangesAsync();
         }
+                public async Task<int> GetLikesCountAsync(Guid complaintId)
+        {
+            return await _context.Votes
+                .CountAsync(v => v.ComplaintId == complaintId && v.IsLike);
+        }
     }
 }

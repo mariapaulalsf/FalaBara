@@ -8,5 +8,6 @@ namespace Falabara.Domain.Entities
         Task AddAsync(Vote vote);
         Task RemoveAsync(Vote vote);
         Task UpdateAsync(Vote vote);
+        Task<int> GetLikesCountAsync(Guid complaintId);
     }
 }
