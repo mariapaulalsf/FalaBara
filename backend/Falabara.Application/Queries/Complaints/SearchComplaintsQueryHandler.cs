@@ -26,6 +26,7 @@ namespace Falabara.Application.Queries.Complaint
                 c.""Description"",
                 c.""Neighborhood"",
                 c.""CreatedAt"",
+                c.""OfficialResponse"",
                 u.""name"" as AuthorName,
                 
                 -- Tradução do Status
