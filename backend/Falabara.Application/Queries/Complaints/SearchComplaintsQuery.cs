@@ -8,16 +8,22 @@ namespace Falabara.Application.Queries.Complaint
     {
         public string? Search { get; set; } 
         public ComplaintCategory? Category { get; set; }
-        public ComplaintStatus? Status { get; set; }    
+        public ComplaintStatus? Status { get; set; }  
+
+        public string OrderBy { get; set; }  
+
+        public Guid? UserId { get; set; }
         
         public int Page { get; set; }
         public int PerPage { get; set; }
 
-        public SearchComplaintsQuery(string? search, ComplaintCategory? category, ComplaintStatus? status, int page, int perPage)
+        public SearchComplaintsQuery(string? search, ComplaintCategory? category, ComplaintStatus? status, string orderBy, Guid? userId, int page, int perPage)
         {
             Search = search;
             Category = category;
             Status = status;
+            OrderBy = orderBy?.ToLower() ?? "date";
+            UserId = userId; 
             Page = page <= 0 ? 1 : page;
             PerPage = perPage <= 0 ? 10 : perPage;
         }

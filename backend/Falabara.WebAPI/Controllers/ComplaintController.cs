@@ -77,12 +77,23 @@ namespace Falabara.WebAPI.Controllers
             [FromQuery] string? search, 
             [FromQuery] ComplaintCategory? category, 
             [FromQuery] ComplaintStatus? status,
+            [FromQuery] string? orderBy,
+            [FromQuery] bool onlyMine = false, 
             [FromQuery] int page = 1, 
             [FromQuery] int perPage = 10)
         {
             try
             {
-                var query = new SearchComplaintsQuery(search, category, status, page, perPage);
+                Guid? filtroUsuario = null;
+                if (onlyMine)
+                {
+                    var userIdString = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                    if (string.IsNullOrEmpty(userIdString))
+                        return Unauthorized(new { message = "Faça login para ver suas reclamações." });
+                    filtroUsuario = Guid.Parse(userIdString);
+                }
+                var query = new SearchComplaintsQuery(search, category, status, orderBy, filtroUsuario, page, perPage);
+                
                 var result = await _mediator.Send(query);
                 return Ok(result);
             }
