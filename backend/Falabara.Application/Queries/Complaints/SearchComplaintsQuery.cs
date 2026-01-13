@@ -40,6 +40,7 @@ namespace Falabara.Application.Queries.Complaint
             public string StatusName { get; set; }   
             public string CategoryName { get; set; } 
             public string AuthorName { get; set; } 
+            public string? OfficialResponse { get; set; }
             
             public int TotalItems { get; set; }
         }

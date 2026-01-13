@@ -103,6 +103,37 @@ namespace Falabara.WebAPI.Controllers
 
             return Ok(complaint);
         }
+        [Authorize]
+        [HttpPut("{id}/status")]
+        public async Task<IActionResult> UpdateStatus(Guid id, [FromBody] UpdateStatusRequest request)
+        {
+            try
+            {
+                var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                var role = User.FindFirst(ClaimTypes.Role)?.Value;
+
+                if (role != UserType.CityHall.ToString() && role != UserType.Developer.ToString())
+                {
+                    return StatusCode(403, new { mensagem = "Apenas a Prefeitura pode alterar o status da reclamação." });
+                }
+
+                var command = new UpdateComplaintStatusCommand
+                {
+                    ComplaintId = id,
+                    UserId = userId,
+                    NewStatus = request.Status,
+                    OfficialResponse = request.RespostaOficial
+                };
+
+                await _mediator.Send(command);
+                return Ok(new { mensagem = "Status atualizado com sucesso!" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { mensagem = ex.Message });
+            }
+        }
+    
     }
 
     public class CreateComplaintRequest
@@ -112,5 +143,10 @@ namespace Falabara.WebAPI.Controllers
         public string Location { get; set; }
         public string Neighborhood { get; set; }
         public ComplaintCategory Category { get; set; }
+    }
+    public class UpdateStatusRequest
+    {
+        public ComplaintStatus Status { get; set; }
+        public string? RespostaOficial { get; set; }
     }
 }
