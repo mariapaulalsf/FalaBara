@@ -72,7 +72,7 @@ namespace Falabara.WebAPI.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpGet("search")]
         public async Task<IActionResult> Search(
             [FromQuery] string? search, 
             [FromQuery] ComplaintCategory? category, 
@@ -93,7 +93,7 @@ namespace Falabara.WebAPI.Controllers
         }
 
         // GET: api/complaints/{id} (Detalhes)
-        [HttpGet("{id}")]
+        [HttpGet("get/{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
             var query = new GetComplaintByIdQuery(id);
