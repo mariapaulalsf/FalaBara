@@ -9,6 +9,7 @@ namespace Falabara.Infrastructure.Context
         public FalabaraContext(DbContextOptions<FalabaraContext> options) : base(options) { }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<Complaint> Complaints { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
