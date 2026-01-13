@@ -19,7 +19,15 @@ namespace Falabara.Application.Queries.Complaint
         public async Task<SearchComplaintsQueryResponse> Handle(SearchComplaintsQuery request, CancellationToken cancellationToken)
         {
             int offset = (request.Page - 1) * request.PerPage;
-            string sql = @"
+
+            string orderByClause = "ORDER BY c.\"CreatedAt\" DESC"; 
+
+            if (request.OrderBy == "votes")
+            {
+                orderByClause = "ORDER BY LikesCount DESC, c.\"CreatedAt\" DESC";
+            }
+
+            string sql = $@"
             SELECT 
                 c.""Id"",
                 c.""Title"",
@@ -29,6 +37,10 @@ namespace Falabara.Application.Queries.Complaint
                 c.""OfficialResponse"",
                 u.""name"" as AuthorName,
                 
+                -- Subqueries para contar votos (Likes e Dislikes)
+                (SELECT COUNT(*) FROM ""Votes"" v WHERE v.""ComplaintId"" = c.""Id"" AND v.""IsLike"" = true) as LikesCount,
+                (SELECT COUNT(*) FROM ""Votes"" v WHERE v.""ComplaintId"" = c.""Id"" AND v.""IsLike"" = false) as DislikesCount,
+
                 -- Tradução do Status
                 CASE 
                     WHEN c.""Status"" = 0 THEN 'Aberto'
@@ -38,7 +50,7 @@ namespace Falabara.Application.Queries.Complaint
                     ELSE 'Cancelado'
                 END as StatusName,
 
-                -- Tradução da Categoria (Simplificado)
+                -- Tradução da Categoria
                 CASE 
                     WHEN c.""Category"" = 0 THEN 'Saúde'
                     WHEN c.""Category"" = 1 THEN 'Obras/Infraestrutura'
@@ -62,7 +74,12 @@ namespace Falabara.Application.Queries.Complaint
                 ))
                 AND (@Category IS NULL OR c.""Category"" = @Category)
                 AND (@Status IS NULL OR c.""Status"" = @Status)
-            ORDER BY c.""CreatedAt"" DESC
+                
+                -- FILTRO DE USUÁRIO (Para a aba 'Minhas Reclamações')
+                AND (@UserId IS NULL OR c.""UserId"" = @UserId)
+
+            {orderByClause} -- <--- AQUI ENTRA A ORDENAÇÃO ESCOLHIDA
+            
             LIMIT @PerPage OFFSET @Offset";
 
             var result = await _dbConnection.QueryAsync<SearchComplaintsQueryResponse.ComplaintDto>(
@@ -71,6 +88,7 @@ namespace Falabara.Application.Queries.Complaint
                     Search = request.Search, 
                     Category = request.Category,
                     Status = request.Status,
+                    UserId = request.UserId, 
                     PerPage = request.PerPage, 
                     Offset = offset 
                 });

@@ -18,6 +18,7 @@ builder.Services.AddDbContext<FalabaraContext>(options =>
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IComplaintRepository, ComplaintRepository>();
+builder.Services.AddScoped<IVoteRepository, VoteRepository>();
 builder.Services.AddScoped<TokenService>(); 
 
 //MEDIATOR
