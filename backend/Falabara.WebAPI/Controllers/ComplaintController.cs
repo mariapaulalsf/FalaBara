@@ -19,9 +19,9 @@ namespace Falabara.WebAPI.Controllers
             _mediator = mediator;
         }
 
-        [Authorize] 
+        [Authorize]
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateComplaintRequest request)
+        public async Task<IActionResult> Create([FromForm] CreateComplaintRequest request)
         {
             try
             {
@@ -34,6 +34,10 @@ namespace Falabara.WebAPI.Controllers
                     Description = request.Description,
                     Location = request.Location,
                     Neighborhood = request.Neighborhood,
+                    // Passando os novos dados
+                    Latitude = request.Latitude,
+                    Longitude = request.Longitude,
+                    Image = request.Image,
                     Category = request.Category
                 };
 
@@ -74,12 +78,12 @@ namespace Falabara.WebAPI.Controllers
 
         [HttpGet("search")]
         public async Task<IActionResult> Search(
-            [FromQuery] string? search, 
-            [FromQuery] ComplaintCategory? category, 
+            [FromQuery] string? search,
+            [FromQuery] ComplaintCategory? category,
             [FromQuery] ComplaintStatus? status,
             [FromQuery] string? orderBy,
-            [FromQuery] bool onlyMine = false, 
-            [FromQuery] int page = 1, 
+            [FromQuery] bool onlyMine = false,
+            [FromQuery] int page = 1,
             [FromQuery] int perPage = 10)
         {
             try
@@ -93,7 +97,7 @@ namespace Falabara.WebAPI.Controllers
                     filtroUsuario = Guid.Parse(userIdString);
                 }
                 var query = new SearchComplaintsQuery(search, category, status, orderBy, filtroUsuario, page, perPage);
-                
+
                 var result = await _mediator.Send(query);
                 return Ok(result);
             }
@@ -144,16 +148,19 @@ namespace Falabara.WebAPI.Controllers
                 return BadRequest(new { mensagem = ex.Message });
             }
         }
-    
+
     }
 
     public class CreateComplaintRequest
     {
         public string Title { get; set; }
         public string Description { get; set; }
-        public string Location { get; set; }
-        public string Neighborhood { get; set; }
+        public string? Location { get; set; }
+        public string? Neighborhood { get; set; }
+        public double Latitude { get; set; }  
+        public double Longitude { get; set; } 
         public ComplaintCategory Category { get; set; }
+        public IFormFile? Image { get; set; } 
     }
     public class UpdateStatusRequest
     {

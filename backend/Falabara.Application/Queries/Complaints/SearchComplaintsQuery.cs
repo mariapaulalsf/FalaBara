@@ -40,7 +40,11 @@ namespace Falabara.Application.Queries.Complaint
             public Guid Id { get; set; }
             public string Title { get; set; }
             public string Description { get; set; }
-            public string Neighborhood { get; set; } 
+            public string? Neighborhood { get; set; } 
+            public string? Location { get; set; }
+            public double Latitude { get; set; }  
+            public double Longitude { get; set; } 
+            public string? ImageUrl { get; set; }
             public DateTime CreatedAt { get; set; }
 
             public string StatusName { get; set; }   

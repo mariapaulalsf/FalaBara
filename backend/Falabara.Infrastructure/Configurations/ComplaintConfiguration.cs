@@ -14,15 +14,18 @@ namespace Falabara.Infrastructure.Configurations
 
             builder.Property(c => c.Title).HasMaxLength(150).IsRequired();
             builder.Property(c => c.Description).HasMaxLength(2000).IsRequired();
-            builder.Property(c => c.Location).HasMaxLength(200).IsRequired();
-            builder.Property(c => c.Neighborhood).HasMaxLength(100).IsRequired();
+            builder.Property(c => c.Location).HasMaxLength(200).IsRequired(false);
+            builder.Property(c => c.Neighborhood).HasMaxLength(100).IsRequired(false);
+            builder.Property(c => c.Latitude).IsRequired();
+            builder.Property(c => c.Longitude).IsRequired();
+            builder.Property(c => c.ImageUrl).IsRequired(false); 
             builder.Property(c => c.Status).IsRequired();
             builder.Property(c => c.Category).IsRequired();
 
             builder.HasOne(c => c.User)
-                   .WithMany() 
+                   .WithMany()
                    .HasForeignKey(c => c.UserId)
-                   .OnDelete(DeleteBehavior.Restrict); 
+                   .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
