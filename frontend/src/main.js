@@ -9,6 +9,11 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import 'sweetalert2/dist/sweetalert2.min.css'
 import 'vue-toastification/dist/index.css'
+import { BarChart2Icon, RefreshCwIcon } from 'vue-feather-icons'
+
+Vue.component('BarChart2Icon', BarChart2Icon)
+Vue.component('RefreshCwIcon', RefreshCwIcon)
+
 
 import App from './App.vue'
 import router from './router'

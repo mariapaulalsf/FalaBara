@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "apexcharts": "^5.3.6",
-    "vue-apexcharts": "^1.7.0"
+    "vue-apexcharts": "^1.7.0",
+    "vue-feather-icons": "^5.1.0"
   }
 }
