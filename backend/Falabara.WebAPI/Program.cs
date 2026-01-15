@@ -22,6 +22,8 @@ builder.Services.AddScoped<IComplaintRepository, ComplaintRepository>();
 builder.Services.AddScoped<IVoteRepository, VoteRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<TokenService>(); 
+builder.Services.AddScoped<Falabara.Application.Services.IFileService, Falabara.Application.Services.LocalFileService>();
+var app = builder.Build();
 
 //MEDIATOR
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Falabara.Application.Commands.User.CreateUserCommand).Assembly));
@@ -88,8 +90,6 @@ builder.Services.AddCors(options =>
     });
 });
 
-var app = builder.Build();
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -99,6 +99,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowAll");
 app.UseAuthentication(); 
 app.UseAuthorization();
+app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 app.MapControllers();

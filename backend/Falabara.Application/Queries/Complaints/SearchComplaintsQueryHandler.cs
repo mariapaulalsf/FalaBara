@@ -20,7 +20,7 @@ namespace Falabara.Application.Queries.Complaint
         {
             int offset = (request.Page - 1) * request.PerPage;
 
-            string orderByClause = "ORDER BY c.\"CreatedAt\" DESC"; 
+            string orderByClause = "ORDER BY c.\"CreatedAt\" DESC";
 
             if (request.OrderBy == "votes")
             {
@@ -33,6 +33,10 @@ namespace Falabara.Application.Queries.Complaint
                 c.""Title"",
                 c.""Description"",
                 c.""Neighborhood"",
+                c.""Location"",  
+                c.""Latitude"",   
+                c.""Longitude"",  
+                c.""ImageUrl"",
                 c.""CreatedAt"",
                 c.""OfficialResponse"",
                 u.""name"" as AuthorName,
@@ -83,14 +87,15 @@ namespace Falabara.Application.Queries.Complaint
             LIMIT @PerPage OFFSET @Offset";
 
             var result = await _dbConnection.QueryAsync<SearchComplaintsQueryResponse.ComplaintDto>(
-                sql, 
-                new { 
-                    Search = request.Search, 
+                sql,
+                new
+                {
+                    Search = request.Search,
                     Category = request.Category,
                     Status = request.Status,
-                    UserId = request.UserId, 
-                    PerPage = request.PerPage, 
-                    Offset = offset 
+                    UserId = request.UserId,
+                    PerPage = request.PerPage,
+                    Offset = offset
                 });
 
             var list = result.ToList();
