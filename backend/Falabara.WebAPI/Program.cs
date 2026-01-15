@@ -3,14 +3,13 @@ using Falabara.Infrastructure.Context;
 using Falabara.Infrastructure.Repositories;
 using Falabara.Domain.Entities;
 using MediatR;
-using Falabara.Application.Services;
+using Falabara.Application.Services; // Importante para o FileService
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens; 
 using System.Text;
 using Microsoft.OpenApi.Models; 
 using Npgsql; 
 using System.Data;
-using Microsoft.CodeAnalysis.CodeStyle;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,13 +21,10 @@ builder.Services.AddScoped<IComplaintRepository, ComplaintRepository>();
 builder.Services.AddScoped<IVoteRepository, VoteRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<TokenService>(); 
-builder.Services.AddScoped<Falabara.Application.Services.IFileService, Falabara.Application.Services.LocalFileService>();
-var app = builder.Build();
+builder.Services.AddScoped<IFileService, LocalFileService>(); 
 
-//MEDIATOR
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Falabara.Application.Commands.User.CreateUserCommand).Assembly));
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Falabara.Application.Commands.Complaint.CreateComplaintCommand).Assembly));
 
-//AUTENTICAÇÃO JWT 
 var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]);
 builder.Services.AddAuthentication(x =>
 {
@@ -59,7 +55,7 @@ builder.Services.AddSwaggerGen(c =>
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "Insira o token JWT desta maneira: Bearer {seu_token}",
+        Description = "JWT Authorization header using the Bearer scheme.",
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
@@ -89,6 +85,7 @@ builder.Services.AddCors(options =>
         policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
     });
 });
+var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
@@ -97,9 +94,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowAll");
+app.UseStaticFiles(); 
+
 app.UseAuthentication(); 
 app.UseAuthorization();
-app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 app.MapControllers();

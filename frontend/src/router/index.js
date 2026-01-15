@@ -12,7 +12,7 @@ const router = new VueRouter({
     {
       path: '/',
       name: 'landing',
-      component: () => import('@/views/main/SabaraDashboard.vue')
+      component: () => import('@/views/main/ComplaintForm.vue')
     },
     {
       path: '/home', 

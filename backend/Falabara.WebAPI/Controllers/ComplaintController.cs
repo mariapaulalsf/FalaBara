@@ -18,23 +18,23 @@ namespace Falabara.WebAPI.Controllers
         {
             _mediator = mediator;
         }
-
         [Authorize]
         [HttpPost]
+        // [AllowAnonymous]
         public async Task<IActionResult> Create([FromForm] CreateComplaintRequest request)
         {
             try
             {
                 var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                // var userId = Guid.Parse("7f275648-e6f2-4d6f-be9d-e49720415b0f");
 
                 var command = new CreateComplaintCommand
                 {
                     UserId = userId,
                     Title = request.Title,
                     Description = request.Description,
-                    Location = request.Location,
-                    Neighborhood = request.Neighborhood,
-                    // Passando os novos dados
+                    Location = request.Location ?? "Sem local",
+                    Neighborhood = request.Neighborhood ?? "Sem bairro",
                     Latitude = request.Latitude,
                     Longitude = request.Longitude,
                     Image = request.Image,
@@ -157,10 +157,10 @@ namespace Falabara.WebAPI.Controllers
         public string Description { get; set; }
         public string? Location { get; set; }
         public string? Neighborhood { get; set; }
-        public double Latitude { get; set; }  
-        public double Longitude { get; set; } 
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
         public ComplaintCategory Category { get; set; }
-        public IFormFile? Image { get; set; } 
+        public IFormFile? Image { get; set; }
     }
     public class UpdateStatusRequest
     {
