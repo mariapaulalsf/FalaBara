@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import authRoutes from './routes/auth' // <--- Importar as rotas que criamos
+import authRoutes from './routes/auth' 
 
 Vue.use(VueRouter)
 
@@ -11,12 +11,11 @@ const router = new VueRouter({
     ...authRoutes,
     {
       path: '/',
-      name: 'landing', // Nome da rota
-      component: () => import('@/views/main/Landing.vue')
-      // meta: { requiresAuth: false } // Página pública
+      name: 'landing',
+      component: () => import('@/views/main/SabaraDashboard.vue')
     },
     {
-      path: '/home', // A Home real (Dashboard) será aqui depois do login
+      path: '/home', 
       name: 'home',
       component: () => import('@/views/main/Home.vue'),
       meta: { requiresAuth: true }
