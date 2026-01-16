@@ -13,28 +13,23 @@ using System.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// DB
 builder.Services.AddDbContext<FalabaraContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Repositórios
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IComplaintRepository, ComplaintRepository>();
 builder.Services.AddScoped<IVoteRepository, VoteRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
-// Services
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<Falabara.Application.Services.IFileService,
     Falabara.Application.Services.LocalFileService>();
 
-// ✅ MEDIATR — ANTES DO BUILD
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(
         typeof(Falabara.Application.Commands.User.CreateUserCommand).Assembly
     ));
 
-// JWT
 var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]);
 
 builder.Services.AddAuthentication(options =>
@@ -55,11 +50,9 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Dapper / IDbConnection
 builder.Services.AddScoped<IDbConnection>(sp =>
     new NpgsqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Controllers & Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -95,7 +88,6 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -104,10 +96,8 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader());
 });
 
-// 🔥 SÓ AGORA builda
 var app = builder.Build();
 
-// Pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
