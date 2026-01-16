@@ -39,7 +39,7 @@
 import axios from '@/libs/axios'
 
 export default {
-  name: 'AuthRegister', // Nome composto obrigatório
+  name: 'AuthRegister', 
   data () {
     return {
       loading: false,

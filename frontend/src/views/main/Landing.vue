@@ -43,13 +43,12 @@
 </template>
 
 <script>
-// Ajuste os nomes dos arquivos conforme você salvou na sua pasta
 import SabaraDashboard from './SabaraDashboard.vue'
 import ComplaintFeed from './ComplaintsFeed.vue'
 import { PlusCircleIcon } from 'vue-feather-icons'
 
 export default {
-  name: 'LandingPage', // CORREÇÃO: Nome composto (Multi-word)
+  name: 'LandingPage', 
   components: { SabaraDashboard, ComplaintFeed, PlusCircleIcon },
   data () {
     return {

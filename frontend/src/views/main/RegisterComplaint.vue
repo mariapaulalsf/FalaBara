@@ -93,11 +93,9 @@ import axios from '@/libs/axios'
 import { BCard, BForm, BFormGroup, BFormInput, BFormTextarea, BRow, BCol, BButton, BFormSelect, BFormFile, BSpinner, BModal } from 'bootstrap-vue'
 // import { MapPinIcon, CheckIcon, MapIcon } from 'vue-feather-icons'
 
-// Importações do Leaflet (Mapa)
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
-// Correção Bug de Ícones do Leaflet no Vue
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
@@ -141,7 +139,6 @@ export default {
     }
   },
   methods: {
-    // 1. Captura Lat/Long do Navegador (GPS)
     getLocation () {
       if (!('geolocation' in navigator)) {
         this.$toast?.error('Seu navegador não suporta geolocalização.')
@@ -164,19 +161,15 @@ export default {
       )
     },
 
-    // 2. Abre Modal do Mapa
     openMapModal () {
       this.$bvModal.show('map-modal')
     },
 
-    // 3. Inicia o Mapa Leaflet
     initMap () {
-      // Se já existe, limpa para não duplicar
       if (this.map) {
         this.map.remove()
       }
 
-      // Define centro inicial (Se já tiver pego GPS, usa ele. Se não, usa centro de Sabará)
       const lat = this.form.latitude || -19.8917
       const lng = this.form.longitude || -43.8070
 
@@ -186,12 +179,10 @@ export default {
         attribution: '&copy; OpenStreetMap contributors'
       }).addTo(this.map)
 
-      // Se já tiver coordenada, põe o pino
       if (this.form.latitude) {
         this.placeMarker(this.form.latitude, this.form.longitude)
       }
 
-      // Evento de Clique
       this.map.on('click', (e) => {
         this.placeMarker(e.latlng.lat, e.latlng.lng)
       })
@@ -206,7 +197,6 @@ export default {
       this.form.longitude = lng
     },
 
-    // 4. Envia para o Backend
     async submitComplaint () {
       if (!this.form.latitude || !this.form.longitude) {
         this.$toast?.warning('A localização é obrigatória! Use o GPS ou o Mapa.')
@@ -221,7 +211,6 @@ export default {
         formData.append('Description', this.form.description)
         formData.append('Location', this.form.location)
         formData.append('Neighborhood', this.form.neighborhood)
-        // Converte coordenadas para string
         formData.append('Latitude', this.form.latitude.toString().replace('.', ','))
         formData.append('Longitude', this.form.longitude.toString().replace('.', ','))
         formData.append('Category', this.form.category)
@@ -230,13 +219,10 @@ export default {
           formData.append('Image', this.form.imageFile)
         }
 
-        // --- CORREÇÃO DO ERRO 401 ---
-        // Forçamos o token no cabeçalho aqui caso o interceptor do axios esteja falhando
         const token = localStorage.getItem('token')
         const config = {
           headers: {
             Authorization: `Bearer ${token}`
-            // Content-Type é automático no axios ao enviar FormData
           }
         }
 
@@ -251,7 +237,6 @@ export default {
         this.resetForm()
       } catch (error) {
         console.error('Erro no envio:', error)
-        // Tratamento específico para 401
         if (error.response && error.response.status === 401) {
           this.$toast?.error('Sessão expirada ou inválida. Faça login novamente.')
           this.$router.push({ name: 'auth-login' })
@@ -282,7 +267,6 @@ export default {
 </script>
 
 <style scoped>
-/* CORES PERSONALIZADAS SABARÁ */
 .text-sabara {
   color: #8B0000;
 }

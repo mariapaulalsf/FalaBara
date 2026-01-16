@@ -102,7 +102,6 @@
 
 <script>
 import axios from '@/libs/axios'
-// Certifique-se de importar TODOS os ícones usados
 // import { MapPinIcon, ImageIcon, HeartIcon, RefreshCwIcon, SearchIcon, CalendarIcon, InboxIcon } from 'vue-feather-icons'
 
 export default {
@@ -165,7 +164,7 @@ export default {
         case 'Resolvido': return 'success'
         case 'Em Andamento': return 'warning'
         case 'Cancelado': return 'secondary'
-        default: return 'danger' // Aberto
+        default: return 'danger' 
       }
     },
     formatDate (date) {
