@@ -50,13 +50,13 @@
       <b-row>
         <b-col cols="12" lg="6" class="mb-4">
           <b-card title="Status das Solicitações" class="h-100 shadow-sm border-0">
-            <apexchart type="donut" height="300" :options="chartStatusOptions" :series="chartStatusSeries" />
+            <ApexChart type="donut" height="300" :options="chartStatusOptions" :series="chartStatusSeries" />
           </b-card>
         </b-col>
 
         <b-col cols="12" lg="6" class="mb-4">
           <b-card title="Principais Problemas" class="h-100 shadow-sm border-0">
-            <apexchart type="bar" height="300" :options="chartCategoryOptions" :series="chartCategorySeries" />
+            <ApexChart type="bar" height="300" :options="chartCategoryOptions" :series="chartCategorySeries" />
           </b-card>
         </b-col>
       </b-row>
