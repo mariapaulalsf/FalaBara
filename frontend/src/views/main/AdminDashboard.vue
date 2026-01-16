@@ -28,13 +28,13 @@
 </template>
 
 <script>
-import { getDashboard } from "@/services/dashboard.service";
+import { getDashboard } from '@/services/dashboard.service'
 
 export default {
-  async mounted() {
-    const { data } = await getDashboard();
-    this.kpis = data.kpis;
-    this.charts = data.charts;
+  async mounted () {
+    const { data } = await getDashboard()
+    this.kpis = data.kpis
+    this.charts = data.charts
   }
-};
+}
 </script>

@@ -1,5 +1,5 @@
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Hosting; 
 
 namespace Falabara.Application.Services
 {
@@ -22,10 +22,14 @@ namespace Falabara.Application.Services
             if (file == null || file.Length == 0)
                 return null;
 
-
             var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
-            var uploadPath = Path.Combine(_environment.WebRootPath, "uploads");
-            
+
+            // CORREÇÃO AQUI: Se o WebRootPath for nulo (pasta não existe), usamos o diretório atual + wwwroot
+            string rootPath = _environment.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+
+            var uploadPath = Path.Combine(rootPath, "uploads");
+
+            // Garante que a pasta existe
             if (!Directory.Exists(uploadPath))
                 Directory.CreateDirectory(uploadPath);
 

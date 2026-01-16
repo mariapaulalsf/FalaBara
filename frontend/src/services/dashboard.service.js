@@ -1,5 +1,5 @@
-import api from "./api";
+import api from './api'
 
-export function getDashboard() {
-  return api.get("/dashboard");
+export function getDashboard () {
+  return api.get('/dashboard')
 }
