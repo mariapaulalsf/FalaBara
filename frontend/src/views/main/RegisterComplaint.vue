@@ -71,42 +71,43 @@
 </template>
 
 <script>
-import { createComplaint } from "@/services/complaint.service";
+import { createComplaint } from '@/services/complaint.service'
 
 export default {
-  data() {
+  data () {
     return {
       form: {
-        title: "",
-        description: "",
-        street: "",
-        neighborhood: "",
-        category: ""
+        title: '',
+        description: '',
+        street: '',
+        neighborhood: '',
+        category: ''
       },
       latitude: null,
       longitude: null,
       media: null
-    };
+    }
   },
-  mounted() {
+  mounted () {
     navigator.geolocation.getCurrentPosition(pos => {
-      this.latitude = pos.coords.latitude;
-      this.longitude = pos.coords.longitude;
-    });
+      this.latitude = pos.coords.latitude
+      this.longitude = pos.coords.longitude
+    })
   },
   methods: {
-    onFile(e) {
-      this.media = e.target.files[0];
+    onFile (e) {
+      this.media = e.target.files[0]
     },
-    async submit() {
-      const fd = new FormData();
-      Object.entries(this.form).forEach(([k, v]) => fd.append(k, v));
-      fd.append("latitude", this.latitude);
-      fd.append("longitude", this.longitude);
-      fd.append("media", this.media);
+    async submit () {
+      const fd = new FormData()
+      Object.entries(this.form).forEach(([k, v]) => fd.append(k, v))
+      fd.append('latitude', this.latitude)
+      fd.append('longitude', this.longitude)
+      fd.append('media', this.media)
 
-      await createComplaint(fd);
-      this.$router.push("/feed");
+      await createComplaint(fd)
+      this.$router.push('/feed')
     }
   }
-};
+}
+</script>
