@@ -50,18 +50,14 @@ export default {
     async handleRegister () {
       this.loading = true
       try {
-        // 1. CRIA A VARIÁVEL PAYLOAD (Isso corrige o erro "payload is not defined")
         const payload = {
-          name: this.form.name,
-          email: this.form.email,
-          password: this.form.password,
-          // Remove pontos e traços do CPF antes de enviar
-          cpf: this.form.cpf.replace(/\D/g, '')
+          Nome: this.form.name,
+          Email: this.form.email,
+          Senha: this.form.password,
+          Cpf: this.form.cpf.replace(/\D/g, ''),
+          Type: 0
         }
-
-        // 2. ENVIA PARA A ROTA CERTA (Isso corrige o erro 404)
-        // Se der 404 em '/users', tente '/api/users' dependendo da sua baseURL no axios
-        await axios.post('/users', payload)
+        await axios.post('/auth/registrar', payload)
 
         this.$swal({
           title: 'Sucesso!',
