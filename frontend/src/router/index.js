@@ -19,8 +19,21 @@ const router = new VueRouter({
       name: 'home',
       component: () => import('@/views/main/Home.vue'),
       meta: { requiresAuth: true }
+    },
+    {
+      path: "/admin",
+      component: AdminDashboard,
+      meta: { requiresAuth: true, role: "Admin" }
     }
+
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem("token");
+  if (to.meta.requiresAuth && !token) next("/login");
+  else next();
+});
+
 
 export default router
