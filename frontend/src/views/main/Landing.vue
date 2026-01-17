@@ -69,7 +69,7 @@ export default {
           icon: 'warning',
           showCancelButton: true,
           confirmButtonText: 'Entrar / Cadastrar',
-          cancelButtonText: 'Só olhar'
+          cancelButtonText: 'Navegar pelo site'
         }).then((result) => {
           if (result.isConfirmed) this.$router.push({ name: 'auth-login' })
         })
