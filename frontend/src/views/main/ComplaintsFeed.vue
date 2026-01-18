@@ -3,9 +3,9 @@
     <b-row class="mb-4">
       <b-col md="8">
         <b-input-group class="search-shadow">
-          <b-form-input 
-            v-model="search" 
-            placeholder="Pesquisar por bairro, título..." 
+          <b-form-input
+            v-model="search"
+            placeholder="Pesquisar por bairro, título..."
             class="input-sabara border-right-0"
             @keyup.enter="fetchComplaints"
           />
@@ -16,7 +16,7 @@
           </b-input-group-append>
         </b-input-group>
       </b-col>
-      
+
       <b-col md="4" class="text-right mt-3 mt-md-0">
         <b-button class="btn-refresh shadow-sm" @click="fetchComplaints">
           <refresh-cw-icon size="16" :class="{ 'spin-icon': loading }" />
@@ -37,21 +37,21 @@
     <b-row v-else>
       <b-col md="6" lg="4" v-for="c in complaints" :key="c.id" class="mb-4">
         <b-card no-body class="h-100 shadow-sm border-0 complaint-card">
-          
+
           <div class="card-img-wrapper">
-            <b-card-img-lazy 
-              v-if="c.imageUrl" 
-              :src="resolveImageUrl(c.imageUrl)" 
-              top 
+            <b-card-img-lazy
+              v-if="c.imageUrl"
+              :src="resolveImageUrl(c.imageUrl)"
+              top
               class="complaint-img"
               alt="Evidência"
             ></b-card-img-lazy>
-            
+
             <div v-else class="no-img-placeholder">
               <image-icon size="40" class="text-muted-light" />
               <small class="text-muted d-block mt-2">Sem imagem</small>
             </div>
-            
+
             <span class="category-badge shadow-sm">{{ c.categoryName }}</span>
           </div>
 
@@ -64,13 +64,13 @@
                 {{ c.statusName }}
               </b-badge>
             </div>
-            
+
             <h5 class="card-title font-weight-bold text-dark mb-1">{{ c.title }}</h5>
-            
+
             <h6 class="card-subtitle mb-3 text-muted small d-flex align-items-center">
               <map-pin-icon size="12" class="mr-1 text-danger" /> {{ c.neighborhood || 'Local não informado' }}
             </h6>
-            
+
             <p class="card-text text-truncate-3 flex-grow-1 text-secondary">
               {{ c.description }}
             </p>
@@ -81,15 +81,15 @@
               <div class="author-info">
                 <small class="text-muted">Por: <strong>{{ c.authorName || 'Anônimo' }}</strong></small>
               </div>
-              
-              <b-button 
-                size="sm" 
-                :variant="voting === c.id ? 'danger' : 'outline-danger'" 
+
+              <b-button
+                size="sm"
+                :variant="voting === c.id ? 'danger' : 'outline-danger'"
                 class="btn-vote rounded-pill px-3"
                 @click="vote(c.id)"
                 :disabled="voting === c.id"
               >
-                <heart-icon size="14" :class="{ 'fill-current': voting === c.id }" /> 
+                <heart-icon size="14" :class="{ 'fill-current': voting === c.id }" />
                 <span class="ml-1">{{ c.likesCount || 0 }}</span>
               </b-button>
             </div>
@@ -106,30 +106,30 @@ import { MapPinIcon, ImageIcon, HeartIcon, RefreshCwIcon, SearchIcon, CalendarIc
 
 export default {
   components: { MapPinIcon, ImageIcon, HeartIcon, RefreshCwIcon, SearchIcon, CalendarIcon, InboxIcon },
-  data() {
+  data () {
     return {
       complaints: [],
       loading: false,
       search: '',
       voting: null,
       // URL base do seu backend (ajuste se mudar a porta)
-      apiBaseUrl: 'http://localhost:5282' 
+      apiBaseUrl: 'http://localhost:5282'
     }
   },
-  mounted() {
+  mounted () {
     this.fetchComplaints()
   },
   methods: {
     // --- NOVO MÉTODO PARA ARRUMAR AS IMAGENS ---
-    resolveImageUrl(path) {
-      if (!path) return null;
+    resolveImageUrl (path) {
+      if (!path) return null
       // Se já for um link completo (começa com http), retorna ele mesmo
-      if (path.startsWith('http')) return path;
+      if (path.startsWith('http')) return path
       // Se for relativo (/uploads/...), junta com a URL do backend
-      return `${this.apiBaseUrl}${path}`;
+      return `${this.apiBaseUrl}${path}`
     },
 
-    async fetchComplaints() {
+    async fetchComplaints () {
       this.loading = true
       try {
         const { data } = await axios.get('/complaints/search', {
@@ -143,7 +143,7 @@ export default {
         this.loading = false
       }
     },
-    async vote(id) {
+    async vote (id) {
       const token = localStorage.getItem('token')
       if (!token) {
         this.$swal({
@@ -163,23 +163,23 @@ export default {
       try {
         await axios.post(`/votes/${id}`)
         this.$toast.success('Voto registrado!')
-        this.fetchComplaints() 
+        this.fetchComplaints()
       } catch (error) {
         this.$toast.error('Erro ao votar.')
       } finally {
         this.voting = null
       }
     },
-    getStatusVariant(status) {
-      switch(status) {
-        case 'Resolvido': return 'success';
-        case 'Em Andamento': return 'warning';
-        case 'Cancelado': return 'secondary';
-        default: return 'danger';
+    getStatusVariant (status) {
+      switch (status) {
+        case 'Resolvido': return 'success'
+        case 'Em Andamento': return 'warning'
+        case 'Cancelado': return 'secondary'
+        default: return 'danger'
       }
     },
-    formatDate(date) {
-      if(!date) return ''
+    formatDate (date) {
+      if (!date) return ''
       return new Date(date).toLocaleDateString('pt-BR')
     }
   }

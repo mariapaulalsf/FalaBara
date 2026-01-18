@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import authRoutes from './routes/auth' 
+import authRoutes from './routes/auth'
 
 Vue.use(VueRouter)
 
@@ -8,7 +8,7 @@ const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   routes: [
-    ...authRoutes, 
+    ...authRoutes,
     {
       path: '/',
       name: 'landing',
@@ -31,7 +31,7 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
   if (to.meta.requiresAuth && !token) {
-    next({ name: 'auth-login' }) 
+    next({ name: 'auth-login' })
   } else {
     next()
   }

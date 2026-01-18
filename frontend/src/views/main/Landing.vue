@@ -48,7 +48,7 @@ import ComplaintFeed from './ComplaintsFeed.vue'
 import { PlusCircleIcon } from 'vue-feather-icons'
 
 export default {
-  name: 'LandingPage', 
+  name: 'LandingPage',
   components: { SabaraDashboard, ComplaintFeed, PlusCircleIcon },
   data () {
     return {
