@@ -1,35 +1,35 @@
 <template>
-  <div class="auth-wrapper d-flex align-items-center justify-content-center py-5 bg-light" style="min-height: 100vh">
-    <b-card class="shadow p-4 border-0" style="max-width: 400px; width: 100%">
+  <div class="auth-wrapper d-flex align-items-center justify-content-center py-5" style="min-height: 100vh">
+    <b-card class="shadow p-4 border-0 card_login" style="max-width: 400px; width: 100%">
       <div class="text-center mb-4">
         <h3 class="font-weight-bold text-sabara">Criar Conta</h3>
         <p class="text-muted">Junte-se ao FalaBará</p>
       </div>
 
-      <b-form @submit.prevent="handleRegister">
-        <b-form-group label="Nome">
+      <b-form @submit.prevent="handleRegister" class="text-white">
+        <b-form-group label="Nome" class="m-2">
           <b-form-input v-model="form.name" required />
         </b-form-group>
 
-        <b-form-group label="CPF">
+        <b-form-group label="CPF" class="m-2">
           <b-form-input v-model="form.cpf" required placeholder="Apenas números" />
         </b-form-group>
 
-        <b-form-group label="E-mail">
+        <b-form-group label="E-mail" class="m-2">
           <b-form-input type="email" v-model="form.email" required />
         </b-form-group>
 
-        <b-form-group label="Senha">
+        <b-form-group label="Senha" class="m-2">
           <b-form-input type="password" v-model="form.password" required />
         </b-form-group>
 
-        <b-button type="submit" block :disabled="loading" class="mt-4 bg-sabara border-0">
+        <b-button type="submit" block :disabled="loading" class="mt-4 bg-sabara border-0 ">
           {{ loading ? 'Criando...' : 'Cadastrar' }}
         </b-button>
       </b-form>
 
-      <div class="text-center mt-3">
-        <small>Já tem conta? <router-link :to="{name: 'auth-login'}">Faça Login</router-link></small>
+      <div class="text-center mt-3 text-white">
+        <small>Já tem conta? <router-link id="faca_login" :to="{name: 'auth-login'}">Faça Login</router-link></small>
       </div>
     </b-card>
   </div>
@@ -78,6 +78,17 @@ export default {
 }
 </script>
 <style scoped>
+#faca_login {
+  text-decoration: none;
+  color: white;
+}
+#faca_login:hover{
+  text-decoration: underline;
+  color: blue;
+}
+.card_login{
+  background-color: #534a4f;
+}
 .bg-sabara { background-color: #8B0000; }
-.text-sabara { color: #8B0000; }
+.text-sabara { color: white; }
 </style>
