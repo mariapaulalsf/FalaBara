@@ -26,30 +26,29 @@
 
         <b-card>
           <h5 class="text-muted mb-3">Localização da Ocorrência</h5>
-          <!-- <b-row class="mb-3">
-            <b-col md="6">
-              <b-form-group label="Endereço / Referência">
-                <b-form-input v-model="form.location" placeholder="Rua, Número ou Ponto de Ref." required />
-              </b-form-group>
-            </b-col>
-            <b-col md="6">
-              <b-form-group label="Bairro">
-                <b-form-input v-model="form.neighborhood" placeholder="Bairro" required />
-              </b-form-group>
-            </b-col>
-          </b-row> -->
+
+          <b-row class="mb-3">
+             <b-col md="6">
+               <b-form-group label="Endereço (Preenchimento Automático)">
+                 <b-form-input v-model="form.location" placeholder="Rua detectada..." />
+               </b-form-group>
+             </b-col>
+             <b-col md="6">
+               <b-form-group label="Bairro (Preenchimento Automático)">
+                 <b-form-input v-model="form.neighborhood" placeholder="Bairro detectado..." required />
+               </b-form-group>
+             </b-col>
+          </b-row>
+
           <div class="d-flex flex-wrap align-items-center mb-4 gap-2">
             <b-button variant="outline-danger" class="mr-2 btn-gps" @click="getLocation" :disabled="gpsLoading">
-              {{ gpsLoading ? 'Buscando satélites...' : 'Usar meu GPS Atual' }}
+              {{ gpsLoading ? 'Buscando...' : '📍 Usar meu GPS' }}
             </b-button>
             <b-button variant="outline-secondary" class="btn-map" @click="openMapModal">
-              Selecionar no Mapa
+              🗺️ Selecionar no Mapa
             </b-button>
             <div v-if="form.latitude" class="ml-3 p-2 bg-light rounded border-success text-success font-weight-bold">
               Local Confirmado! <small>({{ form.latitude.toFixed(5) }}, {{ form.longitude.toFixed(5) }})</small>
-            </div>
-            <div v-else class="ml-3 text-danger font-weight-bold">
-              * Localização Obrigatória no Mapa ou GPS
             </div>
           </div>
         </b-card>
@@ -65,25 +64,25 @@
               id="file-upload"
               v-model="form.imageFile"
               :state="Boolean(form.imageFile)"
-              placeholder="Clique para escolher um arquivo..."
-              drop-placeholder="Solte o arquivo aqui..."
+              placeholder="Clique para escolher..."
+              drop-placeholder="Solte aqui..."
               accept="image/*, video/*"
             ></b-form-file>
-            <small class="text-muted">Formatos aceitos: JPG, PNG, MP4. Máx: 1 arquivo.</small>
           </b-form-group>
         </b-card>
-          <div class="text-right mt-5">
+
+        <div class="text-right mt-5">
             <b-button type="submit" variant="primary" size="lg" class="btn-sabara px-5" :disabled="loading || !form.latitude">
               <b-spinner small v-if="loading" class="mr-1"></b-spinner>
               {{ loading ? 'Enviando...' : 'Registrar Reclamação' }}
             </b-button>
-          </div>
+        </div>
 
       </b-form>
     </b-card>
 
     <b-modal id="map-modal" title="Selecione o local exato" size="lg" @shown="initMap" ok-title="Confirmar Local" ok-variant="success" cancel-title="Cancelar">
-      <p class="text-muted text-center mb-2">Clique no mapa para posicionar o marcador vermelho.</p>
+      <p class="text-muted text-center mb-2">Clique no mapa para posicionar o marcador.</p>
       <div id="leaflet-map-container" style="height: 400px; width: 100%;"></div>
     </b-modal>
 
@@ -93,8 +92,6 @@
 <script>
 import axios from '@/libs/axios'
 import { BCard, BForm, BFormGroup, BFormInput, BFormTextarea, BRow, BCol, BButton, BFormSelect, BFormFile, BSpinner, BModal } from 'bootstrap-vue'
-// import { MapPinIcon, CheckIcon, MapIcon } from 'vue-feather-icons'
-
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
@@ -109,7 +106,6 @@ export default {
   name: 'ComplaintForm',
   components: {
     BCard, BForm, BFormGroup, BFormInput, BFormTextarea, BRow, BCol, BButton, BFormSelect, BFormFile, BSpinner, BModal
-    // MapPinIcon, CheckIcon, MapIcon
   },
   data () {
     return {
@@ -143,24 +139,39 @@ export default {
   methods: {
     getLocation () {
       if (!('geolocation' in navigator)) {
-        this.$toast?.error('Seu navegador não suporta geolocalização.')
+        this.$toast?.error('Navegador sem suporte a GPS.')
         return
       }
-
       this.gpsLoading = true
       navigator.geolocation.getCurrentPosition(
         (position) => {
           this.form.latitude = position.coords.latitude
           this.form.longitude = position.coords.longitude
+          this.getAddressFromCoords(this.form.latitude, this.form.longitude)
           this.gpsLoading = false
-          this.$toast?.success('Localização capturada via Satélite!')
+          this.$toast?.success('Localização capturada!')
         },
         (error) => {
           console.error(error)
-          this.$toast?.error('Não foi possível pegar o GPS. Tente usar o mapa.')
+          this.$toast?.error('Erro no GPS. Tente o mapa.')
           this.gpsLoading = false
         }
       )
+    },
+
+    // --- NOVA FUNÇÃO: Preenche Bairro e Rua Automaticamente ---
+    async getAddressFromCoords (lat, lon) {
+      try {
+        const res = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+        if (res.data && res.data.address) {
+          const addr = res.data.address
+          // Tenta pegar o bairro de vários campos possíveis
+          this.form.neighborhood = addr.suburb || addr.neighbourhood || addr.residential || addr.village || ''
+          this.form.location = addr.road || addr.pedestrian || ''
+        }
+      } catch (e) {
+        console.log('Erro ao buscar endereço', e)
+      }
     },
 
     openMapModal () {
@@ -168,100 +179,62 @@ export default {
     },
 
     initMap () {
-      if (this.map) {
-        this.map.remove()
-      }
-
+      if (this.map) this.map.remove()
       const lat = this.form.latitude || -19.8917
       const lng = this.form.longitude || -43.8070
-
       this.map = L.map('leaflet-map-container').setView([lat, lng], 15)
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' }).addTo(this.map)
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-      }).addTo(this.map)
-
-      if (this.form.latitude) {
-        this.placeMarker(this.form.latitude, this.form.longitude)
-      }
+      if (this.form.latitude) this.placeMarker(this.form.latitude, this.form.longitude)
 
       this.map.on('click', (e) => {
         this.placeMarker(e.latlng.lat, e.latlng.lng)
+        // Busca endereço ao clicar no mapa também
+        this.getAddressFromCoords(e.latlng.lat, e.latlng.lng)
       })
     },
 
     placeMarker (lat, lng) {
-      if (this.marker) {
-        this.map.removeLayer(this.marker)
-      }
+      if (this.marker) this.map.removeLayer(this.marker)
       this.marker = L.marker([lat, lng]).addTo(this.map)
       this.form.latitude = lat
       this.form.longitude = lng
     },
 
     async submitComplaint () {
-      if (!this.form.latitude || !this.form.longitude) {
-        this.$toast?.warning('A localização é obrigatória! Use o GPS ou o Mapa.')
+      if (!this.form.latitude) {
+        this.$toast?.warning('Localização obrigatória!')
         return
       }
-
       this.loading = true
-
       try {
         const formData = new FormData()
         formData.append('Title', this.form.title)
         formData.append('Description', this.form.description)
         formData.append('Location', this.form.location)
-        formData.append('Neighborhood', this.form.neighborhood)
+        formData.append('Neighborhood', this.form.neighborhood) // Agora vai preenchido!
         formData.append('Latitude', this.form.latitude.toString().replace('.', ','))
         formData.append('Longitude', this.form.longitude.toString().replace('.', ','))
         formData.append('Category', this.form.category)
-
-        if (this.form.imageFile) {
-          formData.append('Image', this.form.imageFile)
-        }
+        if (this.form.imageFile) formData.append('Image', this.form.imageFile)
 
         const token = localStorage.getItem('token')
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
+        const config = { headers: { Authorization: `Bearer ${token}` } }
 
         await axios.post('/complaints', formData, config)
-
-        this.$swal({
-          title: 'Sucesso!',
-          text: 'Sua reclamação foi enviada para a prefeitura.',
-          icon: 'success'
-        })
-
+        this.$swal({ title: 'Sucesso!', text: 'Reclamação registrada!', icon: 'success' })
         this.resetForm()
+        this.$router.push({ name: 'landing' }) // Redireciona para ver a reclamação
       } catch (error) {
-        console.error('Erro no envio:', error)
-        if (error.response && error.response.status === 401) {
-          this.$toast?.error('Sessão expirada ou inválida. Faça login novamente.')
-          this.$router.push({ name: 'auth-login' })
-        } else {
-          const msg = error.response?.data?.mensagem || 'Erro ao conectar com o servidor.'
-          this.$toast?.error(msg)
-        }
+        const msg = error.response?.data?.mensagem || 'Erro ao enviar.'
+        this.$toast?.error(msg)
       } finally {
         this.loading = false
       }
     },
 
     resetForm () {
-      this.form = {
-        title: '',
-        description: '',
-        location: '',
-        neighborhood: '',
-        latitude: null,
-        longitude: null,
-        category: 0,
-        imageFile: null
-      }
+      this.form = { title: '', description: '', location: '', neighborhood: '', latitude: null, longitude: null, category: 0, imageFile: null }
       this.marker = null
     }
   }
@@ -269,31 +242,8 @@ export default {
 </script>
 
 <style scoped>
-.text-sabara {
-  color: #8B0000;
-}
-
-.input-sabara:focus {
-  border-color: #8B0000;
-  box-shadow: 0 0 0 0.2rem rgba(139, 0, 0, 0.25);
-}
-
-.btn-sabara {
-  background-color: #8B0000;
-  border-color: #8B0000;
-  font-weight: bold;
-  transition: all 0.3s ease;
-}
-
-.btn-sabara:hover {
-  background-color: #660000;
-  border-color: #660000;
-  transform: translateY(-2px);
-}
-
-.spin-icon {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin { 100% { transform: rotate(360deg); } }
+.text-sabara { color: #8B0000; }
+.input-sabara:focus { border-color: #8B0000; box-shadow: 0 0 0 0.2rem rgba(139, 0, 0, 0.25); }
+.btn-sabara { background-color: #8B0000; border-color: #8B0000; }
+.btn-sabara:hover { background-color: #660000; border-color: #660000; }
 </style>

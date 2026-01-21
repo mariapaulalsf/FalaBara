@@ -199,7 +199,6 @@ export default {
     async fetchAllData () {
       this.loading = true
       try {
-        // 1. Busca Métricas (Gráficos)
         const resMetrics = await axios.get('/dashboard')
         this.metrics = resMetrics.data
 

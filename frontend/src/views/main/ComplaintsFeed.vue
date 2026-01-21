@@ -1,200 +1,220 @@
 <template>
   <div class="complaint-feed">
-    <b-card>
-
-      <b-row class="mb-4">
-        <b-col md="8">
-          <b-input-group class="search-shadow">
-            <b-form-input
-              v-model="search"
-              placeholder="Pesquisar por bairro, título..."
-              class="input-sabara border-right-0"
-              @keyup.enter="fetchComplaints"
-            />
-            <b-input-group-append>
-              <b-button class="btn-search border-left-0" @click="fetchComplaints">
-                <search-icon size="18" />
-              </b-button>
-            </b-input-group-append>
-          </b-input-group>
-        </b-col>
-        <b-col md="4" class="text-right mt-3 mt-md-0">
-          <b-button class="btn-refresh shadow-sm" @click="fetchComplaints">
-            <refresh-cw-icon size="16" class="m-2" :class="{ 'spin-icon': loading }" />
-            <span class="ml-2 font-weight-bold">Atualizar</span>
-          </b-button>
-        </b-col>
-      </b-row>
-    </b-card>
-
-    <b-card class="mt-2">
-      <div v-if="loading" class="text-center my-5 py-5">
-        <b-spinner variant="danger" type="grow" label="Carregando..."></b-spinner>
+    <div class="twitter-tabs mb-3 d-flex align-items-center justify-content-between border-bottom">
+      <div class="d-flex">
+        <div class="tab-item" :class="{ active: activeTab === 'recent' }" @click="setActiveTab('recent')">Mais recentes</div>
+        <div class="tab-item" :class="{ active: activeTab === 'votes' }" @click="setActiveTab('votes')">Em Destaque</div>
+        <div class="tab-item" :class="{ active: activeTab === 'mine' }" @click="setActiveTab('mine')">Minhas</div>
+        <div class="tab-item" :class="{ active: activeTab === 'resolved' }" @click="setActiveTab('resolved')">Resolvidas</div>
       </div>
-      <div v-else-if="complaints.length === 0" class="text-center my-5 py-5 bg-light rounded">
-        <inbox-icon size="48" class="text-muted mb-3" />
-        <h5 class="text-muted">Nenhuma ocorrência encontrada.</h5>
-      </div>
-      <b-row v-else>
-        <b-col md="6" lg="4" v-for="c in complaints" :key="c.id" class="mb-4">
-          <b-card no-body class="h-100 shadow-sm border-0 complaint-card">
-            <div class="card-img-wrapper">
-              <b-card-img-lazy
-                v-if="c.imageUrl"
-                :src="resolveImageUrl(c.imageUrl)"
-                top
-                class="complaint-img"
-                alt="Evidência"
-              ></b-card-img-lazy>
-              <div v-else class="no-img-placeholder">
-                <image-icon size="40" class="text-muted-light" />
-                <small class="text-muted d-block mt-2">Sem imagem</small>
-              </div>
-              <span class="category-badge shadow-sm">{{ c.categoryName }}</span>
+    </div>
+
+    <b-card no-body class="mb-4 shadow-sm border-0">
+      <div class="p-3">
+        <b-row class="align-items-center">
+          <b-col cols="12" md="6" class="mb-2 mb-md-0">
+            <div class="search-wrapper">
+              <search-icon size="18" class="search-icon-input" />
+              <b-form-input v-model="search" placeholder="Buscar..." class="input-clean" @input="onSearchInput" />
             </div>
-            <b-card-body class="d-flex flex-column pt-4">
-              <div class="d-flex justify-content-between align-items-center mb-2">
-                <small class="text-muted d-flex align-items-center">
-                  <calendar-icon size="12" class="mr-1"/> {{ formatDate(c.createdAt) }}
-                </small>
-                <b-badge :variant="getStatusVariant(c.statusName)" class="px-2 py-1">
-                  {{ c.statusName }}
-                </b-badge>
-              </div>
-              <h5 class="card-title font-weight-bold text-dark mb-1">{{ c.title }}</h5>
-              <h6 class="card-subtitle mb-3 text-muted small d-flex align-items-center">
-                <map-pin-icon size="12" class="mr-1 text-danger" /> {{ c.neighborhood || 'Local não informado' }}
-              </h6>
-              <p class="card-text text-truncate-3 flex-grow-1 text-secondary">
-                {{ c.description }}
-              </p>
-              <hr class="mt-3 mb-3 border-light">
-              <div class="d-flex justify-content-between align-items-center">
-                <div class="author-info">
-                  <small class="text-muted">Por: <strong>{{ c.authorName || 'Anônimo' }}</strong></small>
-                </div>
-                <b-button
-                  size="sm"
-                  :variant="voting === c.id ? 'danger' : 'outline-danger'"
-                  class="btn-vote rounded-pill px-3"
-                  @click="vote(c.id)"
-                  :disabled="voting === c.id"
-                >
-                  <heart-icon size="14" :class="{ 'fill-current': voting === c.id }" />
-                  <span class="ml-1">{{ c.likesCount || 0 }}</span>
-                </b-button>
-              </div>
-            </b-card-body>
-          </b-card>
-        </b-col>
-      </b-row>
+          </b-col>
+
+          <b-col cols="12" md="6" class="d-flex justify-content-md-end justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+              <b-button variant="flat-primary" class="btn-icon-filter mr-2" :class="{ 'filter-active': isFilterActive }" @click="isFilterActive = !isFilterActive">
+                <filter-icon size="20" />
+              </b-button>
+              <b-button class="btn-refresh-square shadow-sm" @click="fetchComplaints(true)">
+                <refresh-cw-icon size="16" :class="{ 'spin-icon': loading }" />
+                <span class="ml-2 font-weight-bold d-none d-lg-inline">Atualizar</span>
+              </b-button>
+            </div>
+          </b-col>
+        </b-row>
+      </div>
+
+      <b-collapse v-model="isFilterActive" id="filters-collapse">
+        <div class="p-3 bg-light-gray border-top">
+          <b-row>
+            <b-col md="4" class="mb-3">
+              <label class="label-clean">Bairro</label>
+              <b-form-input v-model="filterNeighborhood" placeholder="Ex: Centro" class="input-white" />
+            </b-col>
+            <b-col md="4" class="mb-3">
+              <label class="label-clean">Categoria</label>
+              <v-select v-model="filterCategory" :options="categoryOptions" label="text" :reduce="op => op.value" placeholder="Selecione..." class="bg-white" />
+            </b-col>
+            <b-col md="4" class="mb-3">
+              <label class="label-clean">Status</label>
+              <v-select v-model="filterStatus" :options="statusOptions" label="text" :reduce="op => op.value" placeholder="Selecione..." class="bg-white" />
+            </b-col>
+          </b-row>
+          <div class="text-right d-flex justify-content-end align-items-center">
+             <b-button variant="link" class="text-muted mr-3" size="sm" @click="clearFilters">Limpar</b-button>
+             <b-button variant="danger" size="sm" class="px-4" @click="fetchComplaints(true)">Aplicar Filtros</b-button>
+          </div>
+        </div>
+      </b-collapse>
     </b-card>
+
+    <div v-if="loading" class="text-center my-5 py-5"><b-spinner variant="danger"></b-spinner></div>
+    <div v-else-if="complaints.length === 0" class="text-center my-5 py-5 bg-white shadow-sm rounded">
+      <inbox-icon size="48" class="text-muted mb-3" />
+      <h5 class="text-muted">Nada encontrado.</h5>
+    </div>
+
+    <b-row v-else>
+      <b-col md="6" lg="4" v-for="c in complaints" :key="c.id" class="mb-4">
+        <b-card no-body class="h-100 shadow-sm border-0 complaint-card">
+          <div class="card-img-wrapper">
+             <template v-if="c.imageUrl">
+                <video v-if="isVideo(c.imageUrl)" controls class="complaint-img" :src="resolveImageUrl(c.imageUrl)"></video>
+                <b-card-img-lazy v-else :src="resolveImageUrl(c.imageUrl)" top class="complaint-img"></b-card-img-lazy>
+             </template>
+             <div v-else class="no-img-placeholder"><image-icon size="40" class="text-muted-light" /></div>
+             <span class="category-badge shadow-sm">{{ c.categoryName }}</span>
+
+             <b-button v-if="isOwner(c.userId)" variant="danger" size="sm" class="btn-delete-post" @click="deleteComplaint(c.id)" title="Excluir">
+               <trash-2-icon size="14" />
+             </b-button>
+          </div>
+          <b-card-body class="d-flex flex-column pt-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <small class="text-muted"><calendar-icon size="12"/> {{ formatDate(c.createdAt) }}</small>
+              <b-badge :variant="getStatusVariant(c.statusName)">{{ c.statusName }}</b-badge>
+            </div>
+            <h5 class="card-title font-weight-bold text-dark mb-1">{{ c.title }}</h5>
+            <h6 class="card-subtitle mb-3 text-muted small"><map-pin-icon size="12" class="text-danger" /> {{ c.neighborhood || 'Local não informado' }}</h6>
+            <p class="card-text text-truncate-3 flex-grow-1 text-secondary">{{ c.description }}</p>
+            <hr class="mt-3 mb-3 border-light">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted">Por: <strong>{{ c.authorName || 'Anônimo' }}</strong></small>
+              <b-button size="sm" :variant="voting === c.id ? 'danger' : 'outline-danger'" class="btn-vote rounded-pill px-3" @click="vote(c.id)" :disabled="voting === c.id">
+                <heart-icon size="14" :class="{ 'fill-current': voting === c.id }" /> <span class="ml-1">{{ c.likesCount || 0 }}</span>
+              </b-button>
+            </div>
+          </b-card-body>
+        </b-card>
+      </b-col>
+    </b-row>
   </div>
 </template>
 
 <script>
 import axios from '@/libs/axios'
-import { MapPinIcon, ImageIcon, HeartIcon, RefreshCwIcon, SearchIcon, CalendarIcon, InboxIcon } from 'vue-feather-icons'
+import { MapPinIcon, ImageIcon, HeartIcon, RefreshCwIcon, SearchIcon, CalendarIcon, InboxIcon, FilterIcon, Trash2Icon } from 'vue-feather-icons'
+import vSelect from 'vue-select'
+import 'vue-select/dist/vue-select.css'
 
 export default {
-  components: { MapPinIcon, ImageIcon, HeartIcon, RefreshCwIcon, SearchIcon, CalendarIcon, InboxIcon },
+  components: { MapPinIcon, ImageIcon, HeartIcon, RefreshCwIcon, SearchIcon, CalendarIcon, InboxIcon, FilterIcon, Trash2Icon, vSelect },
   data () {
     return {
       complaints: [],
       loading: false,
       search: '',
       voting: null,
-      // URL base do seu backend (ajuste se mudar a porta)
-      apiBaseUrl: 'http://localhost:5282'
+      apiBaseUrl: 'http://localhost:5282',
+      searchTimeout: null,
+      activeTab: 'recent',
+      isFilterActive: false,
+      filterCategory: null,
+      filterStatus: null,
+      filterNeighborhood: '',
+      currentUserId: null,
+      categoryOptions: [{ value: 0, text: 'Saúde' }, { value: 1, text: 'Infraestrutura' }, { value: 2, text: 'Trânsito' }, { value: 3, text: 'Iluminação' }, { value: 4, text: 'Limpeza' }, { value: 5, text: 'Segurança' }, { value: 6, text: 'Educação' }, { value: 7, text: 'Meio Ambiente' }, { value: 8, text: 'Outros' }],
+      statusOptions: [{ value: 0, text: 'Aberto' }, { value: 1, text: 'Em Análise' }, { value: 2, text: 'Em Andamento' }, { value: 3, text: 'Resolvido' }, { value: 4, text: 'Cancelado' }]
     }
   },
-  mounted () {
-    this.fetchComplaints()
-  },
+  mounted () { this.checkUser(); this.fetchComplaints() },
   methods: {
-    // --- NOVO MÉTODO PARA ARRUMAR AS IMAGENS ---
-    resolveImageUrl (path) {
-      if (!path) return null
-      // Se já for um link completo (começa com http), retorna ele mesmo
-      if (path.startsWith('http')) return path
-      // Se for relativo (/uploads/...), junta com a URL do backend
-      return `${this.apiBaseUrl}${path}`
+    checkUser () {
+      const userData = localStorage.getItem('userData')
+      if (userData) { try { this.currentUserId = JSON.parse(userData).id } catch (e) {} }
     },
+    isOwner (userId) { return this.currentUserId && (userId === this.currentUserId || userId === String(this.currentUserId)) },
+    resolveImageUrl (path) { if (!path) return null; return path.startsWith('http') ? path : `${this.apiBaseUrl}${path}` },
+    isVideo (url) { if (!url) return false; return ['mp4', 'mov', 'webm'].includes(url.split('.').pop().toLowerCase()) },
+    setActiveTab (tab) { this.activeTab = tab; this.fetchComplaints(true) },
+    onSearchInput () { if (this.searchTimeout) clearTimeout(this.searchTimeout); this.searchTimeout = setTimeout(() => { this.fetchComplaints(true) }, 500) },
 
-    async fetchComplaints () {
-      this.loading = true
+    async fetchComplaints (showLoader = true) {
+      if (showLoader) this.loading = true
       try {
-        const { data } = await axios.get('/complaints/search', {
-          params: { search: this.search, perPage: 12 }
-        })
+        let orderBy = 'recent'; let onlyMine = false; let statusFilter = this.filterStatus
+        if (this.activeTab === 'votes') orderBy = 'votes'
+        if (this.activeTab === 'mine') onlyMine = true
+        if (this.activeTab === 'resolved') statusFilter = 3
+
+        const params = {
+          search: this.search,
+          neighborhood: this.filterNeighborhood,
+          perPage: 12,
+          category: this.filterCategory,
+          status: statusFilter,
+          orderBy: orderBy,
+          onlyMine: onlyMine
+        }
+        // Se a API não filtra neighborhood separado, concatena
+        if (this.filterNeighborhood) params.search = (params.search || '') + ' ' + this.filterNeighborhood
+
+        Object.keys(params).forEach(key => params[key] === null && delete params[key])
+        const token = localStorage.getItem('token')
+        const config = { params: params, headers: {} }
+        if (token) config.headers.Authorization = `Bearer ${token}`
+
+        const { data } = await axios.get('/complaints/search', config)
         this.complaints = data.data
-      } catch (error) {
-        console.error(error)
-        this.$toast?.error('Erro ao carregar o feed.')
-      } finally {
-        this.loading = false
-      }
+      } catch (error) { console.error(error); if (showLoader) this.$toast?.error('Erro ao carregar.') } finally { this.loading = false }
     },
     async vote (id) {
       const token = localStorage.getItem('token')
-      if (!token) {
-        this.$swal({
-          title: 'Login Necessário',
-          text: 'Você precisa entrar para apoiar uma reclamação.',
-          icon: 'info',
-          showCancelButton: true,
-          confirmButtonText: 'Ir para Login',
-          cancelButtonText: 'Cancelar'
-        }).then((result) => {
-          if (result.isConfirmed) this.$router.push({ name: 'auth-login' })
-        })
-        return
-      }
-
+      if (!token) return this.$swal({ title: 'Entre para votar', icon: 'info' })
       this.voting = id
-      try {
-        await axios.post(`/votes/${id}`)
-        this.$toast.success('Voto registrado!')
-        this.fetchComplaints()
-      } catch (error) {
-        this.$toast.error('Erro ao votar.')
-      } finally {
-        this.voting = null
-      }
+      try { await axios.post(`/votes/${id}`, {}, { headers: { Authorization: `Bearer ${token}` } }); this.$toast.success('Voto ok!'); await this.fetchComplaints(false) } catch (e) { this.$toast.error('Erro ao votar') } finally { this.voting = null }
     },
-    getStatusVariant (status) {
-      switch (status) {
-        case 'Resolvido': return 'success'
-        case 'Em Andamento': return 'warning'
-        case 'Cancelado': return 'secondary'
-        default: return 'danger'
-      }
+    async deleteComplaint (id) {
+      this.$swal({
+        title: 'Excluir post?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sim'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            const token = localStorage.getItem('token')
+            await axios.delete(`/complaints/${id}`, { headers: { Authorization: `Bearer ${token}` } })
+            this.$toast.success('Excluído.')
+            this.fetchComplaints(true)
+          } catch (e) { this.$toast.error('Erro.') }
+        }
+      })
     },
-    formatDate (date) {
-      if (!date) return ''
-      return new Date(date).toLocaleDateString('pt-BR')
-    }
+
+    clearFilters () {
+      this.filterCategory = null
+      this.filterStatus = null
+      this.filterNeighborhood = ''
+      this.fetchComplaints(true)
+    },
+    getStatusVariant (status) { return status === 'Resolvido' ? 'success' : 'danger' },
+    formatDate (date) { return date ? new Date(date).toLocaleDateString('pt-BR') : '' }
   }
 }
 </script>
 
 <style scoped>
-/* Mesmos estilos anteriores para manter o visual bonito */
-:root { --sabara-red: #8B0000; }
-.search-shadow { box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden; }
-.input-sabara { border: 1px solid #eee; padding: 1.5rem 1rem; }
-.input-sabara:focus { border-color: #8B0000; box-shadow: none; }
-.btn-search { background-color: white; border: 1px solid #eee; color: #8B0000; }
-.btn-search:hover { background-color: #8B0000; color: white; }
-.btn-refresh { background: linear-gradient(135deg, #8B0000 0%, #a01010 100%); border: none; color: white; border-radius: 50px; padding: 0.7rem 1.5rem; }
-.complaint-card { transition: transform 0.3s; border-radius: 12px; overflow: hidden; }
-.complaint-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important; }
-.card-img-wrapper { position: relative; height: 200px; overflow: hidden; background-color: #f0f0f0; }
-.complaint-img { height: 100%; width: 100%; object-fit: cover; transition: transform 0.5s; }
-.complaint-card:hover .complaint-img { transform: scale(1.05); }
-.no-img-placeholder { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.twitter-tabs { overflow-x: auto; white-space: nowrap; }
+.tab-item { padding: 1rem 1.5rem; font-weight: 600; color: #555; cursor: pointer; position: relative; }
+.tab-item:hover { color: #8B0000; }
+.tab-item.active { color: #8B0000; }
+.tab-item.active::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background-color: #8B0000; }
+.search-wrapper { position: relative; width: 100%; }
+.search-icon-input { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #999; }
+.input-clean { border-radius: 20px; background-color: #f0f2f5; border: 1px solid transparent; padding-left: 40px; height: 45px; }
+.btn-icon-filter { background-color: #f8f9fa; border: 1px solid #e9ecef; color: #5e5e5e; border-radius: 8px; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; }
+.btn-refresh-square { background: linear-gradient(135deg, #8B0000 0%, #a01010 100%); border: none; color: white; border-radius: 8px; padding: 0.6rem 1.2rem; height: 42px; display: flex; align-items: center; }
+.complaint-card { border-radius: 12px; overflow: hidden; transition: transform 0.2s; }
+.card-img-wrapper { height: 200px; overflow: hidden; position: relative; background-color: #eee; }
+.complaint-img { width: 100%; height: 100%; object-fit: cover; }
 .category-badge { position: absolute; bottom: 10px; right: 10px; background: white; color: #8B0000; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.75rem; }
-.text-truncate-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-.spin-icon { animation: spin 1s linear infinite; }
-@keyframes spin { 100% { transform: rotate(360deg); } }
+.btn-delete-post { position: absolute; top: 10px; right: 10px; opacity: 0.9; }
+.bg-light-gray { background-color: #fbfbfb; }
 </style>

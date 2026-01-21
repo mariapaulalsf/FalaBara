@@ -40,8 +40,6 @@ namespace Falabara.Application.Queries.Complaint
                 c.""CreatedAt"",
                 c.""OfficialResponse"",
                 u.""name"" as AuthorName,
-                
-                -- Subqueries para contar votos (Likes e Dislikes)
                 (SELECT COUNT(*) FROM ""Votes"" v WHERE v.""ComplaintId"" = c.""Id"" AND v.""IsLike"" = true) as LikesCount,
                 (SELECT COUNT(*) FROM ""Votes"" v WHERE v.""ComplaintId"" = c.""Id"" AND v.""IsLike"" = false) as DislikesCount,
 
@@ -78,11 +76,9 @@ namespace Falabara.Application.Queries.Complaint
                 ))
                 AND (@Category IS NULL OR c.""Category"" = @Category)
                 AND (@Status IS NULL OR c.""Status"" = @Status)
-                
-                -- FILTRO DE USUÁRIO (Para a aba 'Minhas Reclamações')
                 AND (@UserId IS NULL OR c.""UserId"" = @UserId)
 
-            {orderByClause} -- <--- AQUI ENTRA A ORDENAÇÃO ESCOLHIDA
+            {orderByClause}
             
             LIMIT @PerPage OFFSET @Offset";
 

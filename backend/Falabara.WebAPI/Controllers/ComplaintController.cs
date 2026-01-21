@@ -19,13 +19,21 @@ namespace Falabara.WebAPI.Controllers
             _mediator = mediator;
         }
 
-        [Authorize]
+       [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create([FromForm] CreateComplaintRequest request)
         {
             try
             {
-                var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                
+                if (string.IsNullOrEmpty(userIdClaim))
+                {
+                    return Unauthorized(new { mensagem = "Token inválido ou usuário não identificado." });
+                }
+
+                var userId = Guid.Parse(userIdClaim);
 
                 var command = new CreateComplaintCommand
                 {
@@ -34,7 +42,6 @@ namespace Falabara.WebAPI.Controllers
                     Description = request.Description,
                     Location = request.Location,
                     Neighborhood = request.Neighborhood,
-                    // Passando os novos dados
                     Latitude = request.Latitude,
                     Longitude = request.Longitude,
                     Image = request.Image,

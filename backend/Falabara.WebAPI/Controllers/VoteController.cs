@@ -18,18 +18,21 @@ namespace Falabara.WebAPI.Controllers
             _mediator = mediator;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> ToggleVote([FromBody] ToggleVoteRequest request)
+        [HttpPost("{complaintId}")]
+        public async Task<IActionResult> ToggleVote(Guid complaintId)
         {
             try
             {
-                var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdClaim)) return Unauthorized();
+
+                var userId = Guid.Parse(userIdClaim);
 
                 var command = new ToggleVoteCommand
                 {
                     UserId = userId,
-                    ComplaintId = request.ComplaintId,
-                    IsLike = request.IsLike
+                    ComplaintId = complaintId,
+                    IsLike = true 
                 };
 
                 var message = await _mediator.Send(command);
@@ -40,11 +43,5 @@ namespace Falabara.WebAPI.Controllers
                 return BadRequest(new { mensagem = ex.Message });
             }
         }
-    }
-
-    public class ToggleVoteRequest
-    {
-        public Guid ComplaintId { get; set; }
-        public bool IsLike { get; set; }
     }
 }

@@ -5,6 +5,7 @@
     "leaflet.heat": "^0.2.0",
     "vue-apexcharts": "^1.7.0",
     "vue-feather-icons": "^5.1.0",
+    "vue-select": "^3.20.4",
     "vue-the-mask": "^0.11.1"
   }
 }
