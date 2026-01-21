@@ -3,6 +3,7 @@ using MediatR;
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
+using Falabara.Application.Queries.User; // Para reconhecer UserDto
 
 namespace Falabara.Application.Queries.User
 {
@@ -19,9 +20,16 @@ namespace Falabara.Application.Queries.User
         {
             string sql = @"
                 SELECT 
-                    ""Id"", ""Name"", ""Email"", ""Cpf"", ""Type"", ""Department"", ""FoneNumber"", ""Active""
+                    id, 
+                    name, 
+                    email, 
+                    cpf, 
+                    user_type as Type,       -- Alias para mapear automático
+                    department, 
+                    fone_number as FoneNumber, -- Alias para mapear automático
+                    active
                 FROM ""Users""
-                WHERE ""Id"" = @Id";
+                WHERE id = @Id";
 
             return await _dbConnection.QueryFirstOrDefaultAsync<UserDto>(sql, new { Id = request.Id });
         }

@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Falabara.Domain.Entities;
 
 namespace Falabara.Application.Queries.User
 {
@@ -22,23 +23,23 @@ namespace Falabara.Application.Queries.User
 
             string sql = @"
                 SELECT 
-                    ""Id"", 
-                    ""Name"", 
-                    ""Email"", 
-                    ""Cpf"", 
-                    ""Type"", 
-                    ""Department"", 
-                    ""FoneNumber"", 
-                    ""Active"",
+                    id, 
+                    name, 
+                    email, 
+                    cpf, 
+                    user_type,   -- Nome real no banco
+                    department, 
+                    fone_number, -- Nome real no banco
+                    active,
                     COUNT(*) OVER() as TotalItems
                 FROM ""Users""
                 WHERE 
                     (@Search IS NULL OR (
-                        ""Name"" ILIKE '%' || @Search || '%' OR
-                        ""Email"" ILIKE '%' || @Search || '%' OR
-                        ""Cpf"" ILIKE '%' || @Search || '%'
+                        name ILIKE '%' || @Search || '%' OR
+                        email ILIKE '%' || @Search || '%' OR
+                        cpf ILIKE '%' || @Search || '%'
                     ))
-                ORDER BY ""Name"" ASC
+                ORDER BY name ASC
                 LIMIT @PerPage OFFSET @Offset";
 
             var result = await _dbConnection.QueryAsync<dynamic>(
@@ -48,17 +49,17 @@ namespace Falabara.Application.Queries.User
 
             var list = result.Select(x => new UserDto
             {
-                Id = x.Id,
-                Name = x.Name,
-                Email = x.Email,
-                Cpf = x.Cpf,
-                Type = (Domain.Entities.UserType)x.Type,
-                Department = x.Department,
-                FoneNumber = x.FoneNumber,
-                Active = x.Active
+                Id = x.id,
+                Name = x.name,
+                Email = x.email,
+                Cpf = x.cpf,
+                Type = (UserType)x.user_type, 
+                Department = x.department,
+                FoneNumber = x.fone_number, 
+                Active = x.active
             }).ToList();
 
-            int totalItems = result.Any() ? (int)result.First().TotalItems : 0;
+            int totalItems = result.Any() ? (int)result.First().totalitems : 0;
 
             return new SearchUsersQueryResponse
             {
