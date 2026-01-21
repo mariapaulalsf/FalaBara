@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Falabara.Application.Commands.User;
+using Falabara.Application.Queries.User; 
 using Falabara.Domain.Entities; 
 
 namespace Falabara.WebAPI.Controllers
@@ -19,6 +20,43 @@ namespace Falabara.WebAPI.Controllers
             _mediator = mediator;
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            try
+            {
+                var query = new GetUserByIdQuery(id);
+                var user = await _mediator.Send(query);
+
+                if (user == null) 
+                    return NotFound(new { message = "Usuário não encontrado." });
+
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> Search(
+            [FromQuery] string? search,
+            [FromQuery] int page = 1,
+            [FromQuery] int perPage = 10)
+        {
+            try
+            {
+                var query = new SearchUsersQuery(search, page, perPage);
+                var result = await _mediator.Send(query);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         [HttpPut("update")]
         public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserRequest request)
         {
@@ -31,7 +69,6 @@ namespace Falabara.WebAPI.Controllers
 
                 var userId = Guid.Parse(userIdString);
 
-                // só Desenvolvedor muda Email/Senha
                 string? emailParaAtualizar = null;
                 string? senhaParaAtualizar = null;
 

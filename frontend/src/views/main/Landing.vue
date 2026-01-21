@@ -210,7 +210,7 @@ export default {
   min-width: 18px;
   text-align: center;
   border-radius: 50%;
-  border: 1px solid #343a40; 
+  border: 1px solid #343a40;
 }
 .notification-list-container {
   max-height: 300px;

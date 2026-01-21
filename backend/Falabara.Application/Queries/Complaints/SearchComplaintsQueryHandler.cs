@@ -40,6 +40,7 @@ namespace Falabara.Application.Queries.Complaint
                 c.""CreatedAt"",
                 c.""OfficialResponse"",
                 u.""name"" as AuthorName,
+                c.""UserId"" as AuthorId,
                 (SELECT COUNT(*) FROM ""Votes"" v WHERE v.""ComplaintId"" = c.""Id"" AND v.""IsLike"" = true) as LikesCount,
                 (SELECT COUNT(*) FROM ""Votes"" v WHERE v.""ComplaintId"" = c.""Id"" AND v.""IsLike"" = false) as DislikesCount,
 

@@ -15,15 +15,30 @@
           <b-col cols="12" md="6" class="mb-2 mb-md-0">
             <div class="search-wrapper">
               <search-icon size="18" class="search-icon-input" />
-              <b-form-input v-model="search" placeholder="Buscar..." class="input-clean" @input="onSearchInput" />
+              <b-form-input
+                v-model="search"
+                placeholder="Buscar..."
+                class="input-clean"
+                @input="onSearchInput"
+              />
             </div>
           </b-col>
 
           <b-col cols="12" md="6" class="d-flex justify-content-md-end justify-content-between align-items-center">
             <div class="d-flex align-items-center">
-              <b-button variant="flat-primary" class="btn-icon-filter mr-2" :class="{ 'filter-active': isFilterActive }" @click="isFilterActive = !isFilterActive">
+              <b-button
+                variant="flat-primary"
+                class="btn-icon-filter mr-3"
+                :class="{
+                  'filter-applied': hasActiveFilters,
+                  'filter-open': isFilterActive
+                }"
+                @click="isFilterActive = !isFilterActive"
+                v-b-tooltip.hover title="Filtros Avançados"
+              >
                 <filter-icon size="20" />
               </b-button>
+
               <b-button class="btn-refresh-square shadow-sm" @click="fetchComplaints(true)">
                 <refresh-cw-icon size="16" :class="{ 'spin-icon': loading }" />
                 <span class="ml-2 font-weight-bold d-none d-lg-inline">Atualizar</span>
@@ -50,7 +65,7 @@
             </b-col>
           </b-row>
           <div class="text-right d-flex justify-content-end align-items-center">
-             <b-button variant="link" class="text-muted mr-3" size="sm" @click="clearFilters">Limpar</b-button>
+             <b-button variant="light" class="text-muted mr-3" size="sm" @click="clearFilters">Limpar</b-button>
              <b-button variant="danger" size="sm" class="px-4" @click="fetchComplaints(true)">Aplicar Filtros</b-button>
           </div>
         </div>
@@ -58,6 +73,7 @@
     </b-card>
 
     <div v-if="loading" class="text-center my-5 py-5"><b-spinner variant="danger"></b-spinner></div>
+
     <div v-else-if="complaints.length === 0" class="text-center my-5 py-5 bg-white shadow-sm rounded">
       <inbox-icon size="48" class="text-muted mb-3" />
       <h5 class="text-muted">Nada encontrado.</h5>
@@ -72,25 +88,44 @@
                 <b-card-img-lazy v-else :src="resolveImageUrl(c.imageUrl)" top class="complaint-img"></b-card-img-lazy>
              </template>
              <div v-else class="no-img-placeholder"><image-icon size="40" class="text-muted-light" /></div>
+
              <span class="category-badge shadow-sm">{{ c.categoryName }}</span>
 
-             <b-button v-if="isOwner(c.userId)" variant="danger" size="sm" class="btn-delete-post" @click="deleteComplaint(c.id)" title="Excluir">
+             <b-button
+               v-if="isOwner(c.authorId)"
+               variant="danger"
+               size="sm"
+               class="btn-delete-post shadow"
+               @click="deleteComplaint(c.id)"
+               v-b-tooltip.hover title="Excluir Post"
+             >
                <trash-2-icon size="14" />
              </b-button>
           </div>
+
           <b-card-body class="d-flex flex-column pt-4">
             <div class="d-flex justify-content-between align-items-center mb-2">
               <small class="text-muted"><calendar-icon size="12"/> {{ formatDate(c.createdAt) }}</small>
               <b-badge :variant="getStatusVariant(c.statusName)">{{ c.statusName }}</b-badge>
             </div>
+
             <h5 class="card-title font-weight-bold text-dark mb-1">{{ c.title }}</h5>
             <h6 class="card-subtitle mb-3 text-muted small"><map-pin-icon size="12" class="text-danger" /> {{ c.neighborhood || 'Local não informado' }}</h6>
             <p class="card-text text-truncate-3 flex-grow-1 text-secondary">{{ c.description }}</p>
+
             <hr class="mt-3 mb-3 border-light">
+
             <div class="d-flex justify-content-between align-items-center">
               <small class="text-muted">Por: <strong>{{ c.authorName || 'Anônimo' }}</strong></small>
-              <b-button size="sm" :variant="voting === c.id ? 'danger' : 'outline-danger'" class="btn-vote rounded-pill px-3" @click="vote(c.id)" :disabled="voting === c.id">
-                <heart-icon size="14" :class="{ 'fill-current': voting === c.id }" /> <span class="ml-1">{{ c.likesCount || 0 }}</span>
+              <b-button
+                size="sm"
+                :variant="voting === c.id ? 'danger' : 'outline-danger'"
+                class="btn-vote rounded-pill px-3"
+                @click="vote(c.id)"
+                :disabled="voting === c.id"
+              >
+                <heart-icon size="14" :class="{ 'fill-current': voting === c.id }" />
+                <span class="ml-1">{{ c.likesCount || 0 }}</span>
               </b-button>
             </div>
           </b-card-body>
@@ -126,13 +161,24 @@ export default {
       statusOptions: [{ value: 0, text: 'Aberto' }, { value: 1, text: 'Em Análise' }, { value: 2, text: 'Em Andamento' }, { value: 3, text: 'Resolvido' }, { value: 4, text: 'Cancelado' }]
     }
   },
+  computed: {
+    hasActiveFilters () {
+      return this.filterNeighborhood !== '' || this.filterCategory !== null || this.filterStatus !== null
+    }
+  },
   mounted () { this.checkUser(); this.fetchComplaints() },
   methods: {
     checkUser () {
       const userData = localStorage.getItem('userData')
-      if (userData) { try { this.currentUserId = JSON.parse(userData).id } catch (e) {} }
+      if (userData) {
+        try {
+          this.currentUserId = String(JSON.parse(userData).id)
+        } catch (e) {}
+      }
     },
-    isOwner (userId) { return this.currentUserId && (userId === this.currentUserId || userId === String(this.currentUserId)) },
+    isOwner (userId) {
+      return this.currentUserId && String(userId) === this.currentUserId
+    },
     resolveImageUrl (path) { if (!path) return null; return path.startsWith('http') ? path : `${this.apiBaseUrl}${path}` },
     isVideo (url) { if (!url) return false; return ['mp4', 'mov', 'webm'].includes(url.split('.').pop().toLowerCase()) },
     setActiveTab (tab) { this.activeTab = tab; this.fetchComplaints(true) },
@@ -155,7 +201,7 @@ export default {
           orderBy: orderBy,
           onlyMine: onlyMine
         }
-        // Se a API não filtra neighborhood separado, concatena
+
         if (this.filterNeighborhood) params.search = (params.search || '') + ' ' + this.filterNeighborhood
 
         Object.keys(params).forEach(key => params[key] === null && delete params[key])
@@ -165,7 +211,12 @@ export default {
 
         const { data } = await axios.get('/complaints/search', config)
         this.complaints = data.data
-      } catch (error) { console.error(error); if (showLoader) this.$toast?.error('Erro ao carregar.') } finally { this.loading = false }
+      } catch (error) {
+        console.error(error)
+        if (showLoader) this.$toast?.error('Erro ao carregar.')
+      } finally {
+        this.loading = false
+      }
     },
     async vote (id) {
       const token = localStorage.getItem('token')
@@ -174,26 +225,18 @@ export default {
       try { await axios.post(`/votes/${id}`, {}, { headers: { Authorization: `Bearer ${token}` } }); this.$toast.success('Voto ok!'); await this.fetchComplaints(false) } catch (e) { this.$toast.error('Erro ao votar') } finally { this.voting = null }
     },
     async deleteComplaint (id) {
-      this.$swal({
-        title: 'Excluir post?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sim'
-      }).then(async (result) => {
+      this.$swal({ title: 'Excluir?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sim', cancelButtonText: 'Não' }).then(async (result) => {
         if (result.isConfirmed) {
           try {
             const token = localStorage.getItem('token')
             await axios.delete(`/complaints/${id}`, { headers: { Authorization: `Bearer ${token}` } })
-            this.$toast.success('Excluído.')
+            this.$toast.success('Excluído com sucesso.')
             this.fetchComplaints(true)
-          } catch (e) { this.$toast.error('Erro.') }
+          } catch (e) { this.$toast.error('Erro ao excluir.') }
         }
       })
     },
-
-    clearFilters () {
-      this.filterCategory = null
-      this.filterStatus = null
-      this.filterNeighborhood = ''
-      this.fetchComplaints(true)
-    },
+    clearFilters () { this.filterCategory = null; this.filterStatus = null; this.filterNeighborhood = ''; this.fetchComplaints(true) },
     getStatusVariant (status) { return status === 'Resolvido' ? 'success' : 'danger' },
     formatDate (date) { return date ? new Date(date).toLocaleDateString('pt-BR') : '' }
   }
@@ -209,12 +252,23 @@ export default {
 .search-wrapper { position: relative; width: 100%; }
 .search-icon-input { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #999; }
 .input-clean { border-radius: 20px; background-color: #f0f2f5; border: 1px solid transparent; padding-left: 40px; height: 45px; }
-.btn-icon-filter { background-color: #f8f9fa; border: 1px solid #e9ecef; color: #5e5e5e; border-radius: 8px; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; }
+.btn-icon-filter { background-color: #f8f9fa; border: 1px solid #e9ecef; color: #5e5e5e; border-radius: 8px; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.btn-icon-filter.filter-open { background-color: #e2e6ea; color: #8B0000; border-color: #dae0e5; }
+.btn-icon-filter.filter-applied { background-color: #8B0000; color: white; border-color: #8B0000; }
+.btn-icon-filter.filter-applied:hover { background-color: #660000; }
+
 .btn-refresh-square { background: linear-gradient(135deg, #8B0000 0%, #a01010 100%); border: none; color: white; border-radius: 8px; padding: 0.6rem 1.2rem; height: 42px; display: flex; align-items: center; }
+
 .complaint-card { border-radius: 12px; overflow: hidden; transition: transform 0.2s; }
 .card-img-wrapper { height: 200px; overflow: hidden; position: relative; background-color: #eee; }
 .complaint-img { width: 100%; height: 100%; object-fit: cover; }
 .category-badge { position: absolute; bottom: 10px; right: 10px; background: white; color: #8B0000; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.75rem; }
-.btn-delete-post { position: absolute; top: 10px; right: 10px; opacity: 0.9; }
+.btn-delete-post {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  opacity: 0.9;
+  z-index: 10;
+}
 .bg-light-gray { background-color: #fbfbfb; }
 </style>

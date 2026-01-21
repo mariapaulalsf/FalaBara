@@ -49,6 +49,8 @@ namespace Falabara.Application.Queries.Complaint
 
             public string StatusName { get; set; }   
             public string CategoryName { get; set; } 
+
+             public Guid AuthorId { get; set; }
             public string AuthorName { get; set; } 
             public string? OfficialResponse { get; set; }
             
