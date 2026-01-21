@@ -1,102 +1,94 @@
 <template>
   <div class="complaint-feed">
-    <b-row class="mb-4">
-      <b-col md="8">
-        <b-input-group class="search-shadow">
-          <b-form-input
-            v-model="search"
-            placeholder="Pesquisar por bairro, título..."
-            class="input-sabara border-right-0"
-            @keyup.enter="fetchComplaints"
-          />
-          <b-input-group-append>
-            <b-button class="btn-search border-left-0" @click="fetchComplaints">
-              <search-icon size="18" />
-            </b-button>
-          </b-input-group-append>
-        </b-input-group>
-      </b-col>
-
-      <b-col md="4" class="text-right mt-3 mt-md-0">
-        <b-button class="btn-refresh shadow-sm" @click="fetchComplaints">
-          <refresh-cw-icon size="16" :class="{ 'spin-icon': loading }" />
-          <span class="ml-2 font-weight-bold">Atualizar</span>
-        </b-button>
-      </b-col>
-    </b-row>
-
-    <div v-if="loading" class="text-center my-5 py-5">
-      <b-spinner variant="danger" type="grow" label="Carregando..."></b-spinner>
-    </div>
-
-    <div v-else-if="complaints.length === 0" class="text-center my-5 py-5 bg-light rounded">
-      <inbox-icon size="48" class="text-muted mb-3" />
-      <h5 class="text-muted">Nenhuma ocorrência encontrada.</h5>
-    </div>
-
-    <b-row v-else>
-      <b-col md="6" lg="4" v-for="c in complaints" :key="c.id" class="mb-4">
-        <b-card no-body class="h-100 shadow-sm border-0 complaint-card">
-
-          <div class="card-img-wrapper">
-            <b-card-img-lazy
-              v-if="c.imageUrl"
-              :src="resolveImageUrl(c.imageUrl)"
-              top
-              class="complaint-img"
-              alt="Evidência"
-            ></b-card-img-lazy>
-
-            <div v-else class="no-img-placeholder">
-              <image-icon size="40" class="text-muted-light" />
-              <small class="text-muted d-block mt-2">Sem imagem</small>
-            </div>
-
-            <span class="category-badge shadow-sm">{{ c.categoryName }}</span>
-          </div>
-
-          <b-card-body class="d-flex flex-column pt-4">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <small class="text-muted d-flex align-items-center">
-                <calendar-icon size="12" class="mr-1"/> {{ formatDate(c.createdAt) }}
-              </small>
-              <b-badge :variant="getStatusVariant(c.statusName)" class="px-2 py-1">
-                {{ c.statusName }}
-              </b-badge>
-            </div>
-
-            <h5 class="card-title font-weight-bold text-dark mb-1">{{ c.title }}</h5>
-
-            <h6 class="card-subtitle mb-3 text-muted small d-flex align-items-center">
-              <map-pin-icon size="12" class="mr-1 text-danger" /> {{ c.neighborhood || 'Local não informado' }}
-            </h6>
-
-            <p class="card-text text-truncate-3 flex-grow-1 text-secondary">
-              {{ c.description }}
-            </p>
-
-            <hr class="mt-3 mb-3 border-light">
-
-            <div class="d-flex justify-content-between align-items-center">
-              <div class="author-info">
-                <small class="text-muted">Por: <strong>{{ c.authorName || 'Anônimo' }}</strong></small>
-              </div>
-
-              <b-button
-                size="sm"
-                :variant="voting === c.id ? 'danger' : 'outline-danger'"
-                class="btn-vote rounded-pill px-3"
-                @click="vote(c.id)"
-                :disabled="voting === c.id"
-              >
-                <heart-icon size="14" :class="{ 'fill-current': voting === c.id }" />
-                <span class="ml-1">{{ c.likesCount || 0 }}</span>
+    <b-card>
+      
+      <b-row class="mb-4">
+        <b-col md="8">
+          <b-input-group class="search-shadow">
+            <b-form-input
+              v-model="search"
+              placeholder="Pesquisar por bairro, título..."
+              class="input-sabara border-right-0"
+              @keyup.enter="fetchComplaints"
+            />
+            <b-input-group-append>
+              <b-button class="btn-search border-left-0" @click="fetchComplaints">
+                <search-icon size="18" />
               </b-button>
+            </b-input-group-append>
+          </b-input-group>
+        </b-col>
+        <b-col md="4" class="text-right mt-3 mt-md-0">
+          <b-button class="btn-refresh shadow-sm" @click="fetchComplaints">
+            <refresh-cw-icon size="16" class="m-2" :class="{ 'spin-icon': loading }" />
+            <span class="ml-2 font-weight-bold">Atualizar</span>
+          </b-button>
+        </b-col>
+      </b-row>
+    </b-card>
+
+    <b-card class="mt-2">
+      <div v-if="loading" class="text-center my-5 py-5">
+        <b-spinner variant="danger" type="grow" label="Carregando..."></b-spinner>
+      </div>
+      <div v-else-if="complaints.length === 0" class="text-center my-5 py-5 bg-light rounded">
+        <inbox-icon size="48" class="text-muted mb-3" />
+        <h5 class="text-muted">Nenhuma ocorrência encontrada.</h5>
+      </div>
+      <b-row v-else>
+        <b-col md="6" lg="4" v-for="c in complaints" :key="c.id" class="mb-4">
+          <b-card no-body class="h-100 shadow-sm border-0 complaint-card">
+            <div class="card-img-wrapper">
+              <b-card-img-lazy
+                v-if="c.imageUrl"
+                :src="resolveImageUrl(c.imageUrl)"
+                top
+                class="complaint-img"
+                alt="Evidência"
+              ></b-card-img-lazy>
+              <div v-else class="no-img-placeholder">
+                <image-icon size="40" class="text-muted-light" />
+                <small class="text-muted d-block mt-2">Sem imagem</small>
+              </div>
+              <span class="category-badge shadow-sm">{{ c.categoryName }}</span>
             </div>
-          </b-card-body>
-        </b-card>
-      </b-col>
-    </b-row>
+            <b-card-body class="d-flex flex-column pt-4">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <small class="text-muted d-flex align-items-center">
+                  <calendar-icon size="12" class="mr-1"/> {{ formatDate(c.createdAt) }}
+                </small>
+                <b-badge :variant="getStatusVariant(c.statusName)" class="px-2 py-1">
+                  {{ c.statusName }}
+                </b-badge>
+              </div>
+              <h5 class="card-title font-weight-bold text-dark mb-1">{{ c.title }}</h5>
+              <h6 class="card-subtitle mb-3 text-muted small d-flex align-items-center">
+                <map-pin-icon size="12" class="mr-1 text-danger" /> {{ c.neighborhood || 'Local não informado' }}
+              </h6>
+              <p class="card-text text-truncate-3 flex-grow-1 text-secondary">
+                {{ c.description }}
+              </p>
+              <hr class="mt-3 mb-3 border-light">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="author-info">
+                  <small class="text-muted">Por: <strong>{{ c.authorName || 'Anônimo' }}</strong></small>
+                </div>
+                <b-button
+                  size="sm"
+                  :variant="voting === c.id ? 'danger' : 'outline-danger'"
+                  class="btn-vote rounded-pill px-3"
+                  @click="vote(c.id)"
+                  :disabled="voting === c.id"
+                >
+                  <heart-icon size="14" :class="{ 'fill-current': voting === c.id }" />
+                  <span class="ml-1">{{ c.likesCount || 0 }}</span>
+                </b-button>
+              </div>
+            </b-card-body>
+          </b-card>
+        </b-col>
+      </b-row>
+    </b-card>
   </div>
 </template>
 

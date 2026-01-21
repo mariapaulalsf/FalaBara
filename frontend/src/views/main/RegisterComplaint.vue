@@ -2,80 +2,82 @@
   <div class="complaint-form-container p-4">
     <b-card class="shadow border-0 rounded-lg">
 
-      <h3 class="font-weight-bold text-sabara mb-4">Nova Reclamação</h3>
+      <h3 class="font-weight-bold text-sabara mb-3 p-3">Nova Reclamação</h3>
 
-      <b-form @submit.prevent="submitComplaint">
+      <b-form @submit.prevent="submitComplaint" class="p-3">
 
-        <b-row>
-          <b-col cols="12">
-            <b-form-group label="Título do Problema" label-for="title" class="font-weight-bold">
-              <b-form-input id="title" v-model="form.title" required placeholder="Ex: Buraco na rua principal" class="input-sabara" />
-            </b-form-group>
-          </b-col>
-          <b-col cols="12">
-            <b-form-group label="Descrição Detalhada" label-for="description" class="font-weight-bold">
-              <b-form-textarea id="description" v-model="form.description" required rows="4"
-                placeholder="Descreva o problema, pontos de referência, etc..." class="input-sabara" />
-            </b-form-group>
-          </b-col>
-        </b-row>
+        <b-card>
+          <b-row>
+            <b-col cols="12">
+              <b-form-group label="Título do Problema" label-for="title" class="font-weight-bold">
+                <b-form-input id="title" v-model="form.title" required placeholder="Ex: Buraco na rua principal" class="input-sabara" />
+              </b-form-group>
+            </b-col>
+            <b-col cols="12">
+              <b-form-group label="Descrição Detalhada" label-for="description" class="font-weight-bold">
+                <b-form-textarea id="description" v-model="form.description" required rows="4"
+                  placeholder="Descreva o problema, pontos de referência, etc..." class="input-sabara" />
+              </b-form-group>
+            </b-col>
+          </b-row>
+        </b-card>
 
         <hr class="my-4">
 
-        <h5 class="text-muted mb-3">Localização da Ocorrência</h5>
-
-        <!-- <b-row class="mb-3">
-          <b-col md="6">
-            <b-form-group label="Endereço / Referência">
-              <b-form-input v-model="form.location" placeholder="Rua, Número ou Ponto de Ref." required />
-            </b-form-group>
-          </b-col>
-          <b-col md="6">
-            <b-form-group label="Bairro">
-              <b-form-input v-model="form.neighborhood" placeholder="Bairro" required />
-            </b-form-group>
-          </b-col>
-        </b-row> -->
-
-        <div class="d-flex flex-wrap align-items-center mb-4 gap-2">
-          <b-button variant="outline-danger" class="mr-2 btn-gps" @click="getLocation" :disabled="gpsLoading">
-            {{ gpsLoading ? 'Buscando satélites...' : 'Usar meu GPS Atual' }}
-          </b-button>
-
-          <b-button variant="outline-secondary" class="btn-map" @click="openMapModal">
-            Selecionar no Mapa
-          </b-button>
-
-          <div v-if="form.latitude" class="ml-3 p-2 bg-light rounded border-success text-success font-weight-bold">
-            Local Confirmado! <small>({{ form.latitude.toFixed(5) }}, {{ form.longitude.toFixed(5) }})</small>
+        <b-card>
+          <h5 class="text-muted mb-3">Localização da Ocorrência</h5>
+          <!-- <b-row class="mb-3">
+            <b-col md="6">
+              <b-form-group label="Endereço / Referência">
+                <b-form-input v-model="form.location" placeholder="Rua, Número ou Ponto de Ref." required />
+              </b-form-group>
+            </b-col>
+            <b-col md="6">
+              <b-form-group label="Bairro">
+                <b-form-input v-model="form.neighborhood" placeholder="Bairro" required />
+              </b-form-group>
+            </b-col>
+          </b-row> -->
+          <div class="d-flex flex-wrap align-items-center mb-4 gap-2">
+            <b-button variant="outline-danger" class="mr-2 btn-gps" @click="getLocation" :disabled="gpsLoading">
+              {{ gpsLoading ? 'Buscando satélites...' : 'Usar meu GPS Atual' }}
+            </b-button>
+            <b-button variant="outline-secondary" class="btn-map" @click="openMapModal">
+              Selecionar no Mapa
+            </b-button>
+            <div v-if="form.latitude" class="ml-3 p-2 bg-light rounded border-success text-success font-weight-bold">
+              Local Confirmado! <small>({{ form.latitude.toFixed(5) }}, {{ form.longitude.toFixed(5) }})</small>
+            </div>
+            <div v-else class="ml-3 text-danger font-weight-bold">
+              * Localização Obrigatória no Mapa ou GPS
+            </div>
           </div>
-          <div v-else class="ml-3 text-danger font-weight-bold">
-            * Localização Obrigatória no Mapa ou GPS
+        </b-card>
+
+        <hr class="my-4">
+
+        <b-card>
+          <b-form-group label="Categoria" label-for="category" class="font-weight-bold">
+            <b-form-select id="category" v-model="form.category" :options="categoryOptions" required class="input-sabara" />
+          </b-form-group>
+          <b-form-group label="Evidência (Foto ou Vídeo)" label-for="file-upload" class="font-weight-bold">
+            <b-form-file
+              id="file-upload"
+              v-model="form.imageFile"
+              :state="Boolean(form.imageFile)"
+              placeholder="Clique para escolher um arquivo..."
+              drop-placeholder="Solte o arquivo aqui..."
+              accept="image/*, video/*"
+            ></b-form-file>
+            <small class="text-muted">Formatos aceitos: JPG, PNG, MP4. Máx: 1 arquivo.</small>
+          </b-form-group>
+        </b-card>
+          <div class="text-right mt-5">
+            <b-button type="submit" variant="primary" size="lg" class="btn-sabara px-5" :disabled="loading || !form.latitude">
+              <b-spinner small v-if="loading" class="mr-1"></b-spinner>
+              {{ loading ? 'Enviando...' : 'Registrar Reclamação' }}
+            </b-button>
           </div>
-        </div>
-
-        <b-form-group label="Categoria" label-for="category" class="font-weight-bold">
-          <b-form-select id="category" v-model="form.category" :options="categoryOptions" required class="input-sabara" />
-        </b-form-group>
-
-        <b-form-group label="Evidência (Foto ou Vídeo)" label-for="file-upload" class="font-weight-bold">
-          <b-form-file
-            id="file-upload"
-            v-model="form.imageFile"
-            :state="Boolean(form.imageFile)"
-            placeholder="Clique para escolher um arquivo..."
-            drop-placeholder="Solte o arquivo aqui..."
-            accept="image/*, video/*"
-          ></b-form-file>
-          <small class="text-muted">Formatos aceitos: JPG, PNG, MP4. Máx: 1 arquivo.</small>
-        </b-form-group>
-
-        <div class="text-right mt-5">
-          <b-button type="submit" variant="primary" size="lg" class="btn-sabara px-5" :disabled="loading || !form.latitude">
-            <b-spinner small v-if="loading" class="mr-1"></b-spinner>
-            {{ loading ? 'Enviando...' : 'Registrar Reclamação' }}
-          </b-button>
-        </div>
 
       </b-form>
     </b-card>

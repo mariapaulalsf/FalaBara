@@ -6,7 +6,7 @@
 
 <style>
 body {
-  background-color: #f5f5f5;
+  background-color: #463e42;
   font-family: 'Montserrat', sans-serif;
 }
 </style>
