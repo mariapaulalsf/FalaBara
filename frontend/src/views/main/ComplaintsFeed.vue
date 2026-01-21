@@ -1,7 +1,7 @@
 <template>
   <div class="complaint-feed">
     <b-card>
-      
+
       <b-row class="mb-4">
         <b-col md="8">
           <b-input-group class="search-shadow">

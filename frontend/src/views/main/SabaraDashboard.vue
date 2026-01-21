@@ -96,45 +96,45 @@
 </template>
 
 <script>
-import axios from "@/libs/axios";
-import { BRow, BCol, BCard, BButton, BSpinner } from "bootstrap-vue";
+import axios from '@/libs/axios'
+import { BRow, BCol, BCard, BButton, BSpinner } from 'bootstrap-vue'
 // CORREÇÃO 1: Importamos os ícones para usar como componentes
-import { BarChart2Icon, RefreshCwIcon } from "vue-feather-icons";
+import { BarChart2Icon, RefreshCwIcon } from 'vue-feather-icons'
 
 // MAPAS (Leaflet + Heatmap)
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-import "leaflet.heat";
+import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
+import 'leaflet.heat'
 
 // Correção dos pinos do Leaflet
-delete L.Icon.Default.prototype._getIconUrl;
+delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
-  iconUrl: require("leaflet/dist/images/marker-icon.png"),
-  shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
-});
+  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+  iconUrl: require('leaflet/dist/images/marker-icon.png'),
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png')
+})
 
 const STATUS_MAP = {
-  0: "Aberto",
-  1: "Em Análise",
-  2: "Em Andamento",
-  3: "Resolvido",
-  4: "Cancelado",
-};
+  0: 'Aberto',
+  1: 'Em Análise',
+  2: 'Em Andamento',
+  3: 'Resolvido',
+  4: 'Cancelado'
+}
 const CATEGORY_MAP = {
-  0: "Saúde",
-  1: "Infraestrutura",
-  2: "Trânsito",
-  3: "Iluminação",
-  4: "Limpeza",
-  5: "Segurança",
-  6: "Educação",
-  7: "Meio Ambiente",
-  8: "Outros",
-};
+  0: 'Saúde',
+  1: 'Infraestrutura',
+  2: 'Trânsito',
+  3: 'Iluminação',
+  4: 'Limpeza',
+  5: 'Segurança',
+  6: 'Educação',
+  7: 'Meio Ambiente',
+  8: 'Outros'
+}
 
 export default {
-  name: "SabaraDashboard",
+  name: 'SabaraDashboard',
   // Registramos os componentes aqui
   components: {
     BRow,
@@ -143,9 +143,9 @@ export default {
     BButton,
     BSpinner,
     BarChart2Icon,
-    RefreshCwIcon,
+    RefreshCwIcon
   },
-  data() {
+  data () {
     return {
       loading: false,
       map: null,
@@ -155,95 +155,95 @@ export default {
         totalResolved: 0,
         totalInAnalysis: 0,
         complaintsByCategory: [],
-        complaintsByStatus: [],
-      },
-    };
+        complaintsByStatus: []
+      }
+    }
   },
   computed: {
-    chartStatusSeries() {
-      return this.metrics.complaintsByStatus.map((i) => i.value);
+    chartStatusSeries () {
+      return this.metrics.complaintsByStatus.map((i) => i.value)
     },
-    chartStatusOptions() {
+    chartStatusOptions () {
       return {
         labels: this.metrics.complaintsByStatus.map(
           (i) => STATUS_MAP[i.label] || `Status ${i.label}`
         ),
-        colors: ["#EA5455", "#FF9F43", "#00CFE8", "#28C76F", "#D4AF37"],
-        legend: { position: "bottom" },
-      };
+        colors: ['#EA5455', '#FF9F43', '#00CFE8', '#28C76F', '#D4AF37'],
+        legend: { position: 'bottom' }
+      }
     },
-    chartCategorySeries() {
+    chartCategorySeries () {
       return [
         {
-          name: "Qtd",
-          data: this.metrics.complaintsByCategory.map((i) => i.value),
-        },
-      ];
+          name: 'Qtd',
+          data: this.metrics.complaintsByCategory.map((i) => i.value)
+        }
+      ]
     },
-    chartCategoryOptions() {
+    chartCategoryOptions () {
       return {
         xaxis: {
           categories: this.metrics.complaintsByCategory.map(
             (i) => CATEGORY_MAP[i.label] || `Cat. ${i.label}`
-          ),
+          )
         },
-        colors: ["#8B0000"],
-        plotOptions: { bar: { borderRadius: 4, horizontal: true } },
-      };
-    },
+        colors: ['#8B0000'],
+        plotOptions: { bar: { borderRadius: 4, horizontal: true } }
+      }
+    }
   },
-  mounted() {
-    this.fetchAllData();
+  mounted () {
+    this.fetchAllData()
   },
   methods: {
-    async fetchAllData() {
-      this.loading = true;
+    async fetchAllData () {
+      this.loading = true
       try {
         // 1. Busca Métricas (Gráficos)
-        const resMetrics = await axios.get("/dashboard");
-        this.metrics = resMetrics.data;
+        const resMetrics = await axios.get('/dashboard')
+        this.metrics = resMetrics.data
 
         // 2. Busca Lista de Reclamações (Para o Mapa de Calor)
-        const resPoints = await axios.get("/complaints/search?perPage=500");
-        this.tempPoints = resPoints.data.data;
+        const resPoints = await axios.get('/complaints/search?perPage=500')
+        this.tempPoints = resPoints.data.data
       } catch (error) {
-        console.error("Erro ao carregar dashboard:", error);
+        console.error('Erro ao carregar dashboard:', error)
       } finally {
         // CORREÇÃO 2: Primeiro paramos o loading para o v-else renderizar a div
-        this.loading = false;
+        this.loading = false
 
         // Esperamos o Vue atualizar o DOM (NextTick) para só então desenhar o mapa
         this.$nextTick(() => {
-          this.initHeatmap(this.tempPoints);
-        });
+          this.initHeatmap(this.tempPoints)
+        })
       }
     },
 
-    initHeatmap(complaints) {
-      const container = document.getElementById("heatmap-container");
-      if (!container) return;
+    initHeatmap (complaints) {
+      const container = document.getElementById('heatmap-container')
+      if (!container) return
 
       if (this.map) {
-        this.map.remove();
-        this.map = null;
+        this.map.remove()
+        this.map = null
       }
-      this.map = L.map("heatmap-container").setView([-19.8917, -43.807], 13);
+      this.map = L.map('heatmap-container').setView([-19.8917, -43.807], 13)
 
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "&copy; OpenStreetMap",
-      }).addTo(this.map);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap'
+      }).addTo(this.map)
       const heatPoints = complaints
         .filter((c) => c.latitude && c.longitude)
-        .map((c) => [c.latitude, c.longitude, 0.6]);
+        .map((c) => [c.latitude, c.longitude, 0.6])
 
       if (heatPoints.length > 0) {
         L.heatLayer(heatPoints, { radius: 25, blur: 15, maxZoom: 17 }).addTo(
           this.map
-        );
+        )
       }
-    },
-  },
-};
+    }
+  }
+}
 </script>
 
 <style scoped>
