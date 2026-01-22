@@ -114,6 +114,10 @@
                 <image-icon size="24" class="text-white-50" />
              </div>
 
+             <span class="status-badge shadow-sm" :class="getStatusClass(c.statusName)">
+                {{ c.statusName }}
+             </span>
+
              <span class="category-badge shadow-sm">{{ c.categoryName }}</span>
 
              <b-button
@@ -131,8 +135,7 @@
           <b-card-body class="d-flex flex-column pt-4">
             <div class="d-flex justify-content-between align-items-center mb-2">
               <small class="text-muted"><calendar-icon size="12"/> {{ formatDate(c.createdAt) }}</small>
-              <b-badge :variant="getStatusVariant(c.statusName)">{{ c.statusName }}</b-badge>
-            </div>
+              </div>
 
             <h5 class="card-title font-weight-bold text-dark mb-1">{{ c.title }}</h5>
             <h6 class="card-subtitle mb-3 text-muted small">
@@ -308,7 +311,16 @@ export default {
       })
     },
     clearFilters () { this.filterCategory = null; this.filterStatus = null; this.filterNeighborhood = ''; this.fetchComplaints(true) },
-    getStatusVariant (status) { return status === 'Resolvido' ? 'success' : 'danger' },
+
+    getStatusClass (status) {
+      switch (status) {
+        case 'Resolvido': return 'status-resolvido'
+        case 'Em Análise': return 'status-em-analise'
+        case 'Em Andamento': return 'status-em-andamento'
+        case 'Cancelado': return 'status-cancelado'
+        default: return 'status-aberto'
+      }
+    },
     formatDate (date) { return date ? new Date(date).toLocaleDateString('pt-BR') : '' }
   }
 }
@@ -333,6 +345,25 @@ export default {
 .complaint-img { width: 100%; height: 100%; object-fit: cover; }
 .video-container { width: 100%; height: 100%; background-color: black; display: flex; align-items: center; justify-content: center; }
 .complaint-video { width: 100%; height: 100%; object-fit: contain; }
+.status-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.75rem;
+  color: white;
+  z-index: 10;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.status-aberto { background-color: #ea5455; }
+.status-em-analise { background-color: #ff9f43; }
+.status-em-andamento { background-color: #00cfe8; }
+.status-resolvido { background-color: #28c76f; }
+.status-cancelado { background-color: #82868b; }
+
 .category-badge { position: absolute; bottom: 10px; right: 10px; background: white; color: #8B0000; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.75rem; }
 .btn-delete-post { position: absolute; top: 10px; right: 10px; opacity: 0.9; z-index: 10; }
 .bg-light-gray { background-color: #fbfbfb; }
