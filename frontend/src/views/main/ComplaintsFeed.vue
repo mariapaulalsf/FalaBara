@@ -17,7 +17,7 @@
               <search-icon size="18" class="search-icon-input" />
               <b-form-input
                 v-model="search"
-                placeholder="Buscar..."
+                placeholder="Buscar por título ou descrição..."
                 class="input-clean"
                 @input="onSearchInput"
               />
@@ -53,15 +53,20 @@
           <b-row>
             <b-col md="4" class="mb-3">
               <label class="label-clean">Bairro</label>
-              <b-form-input v-model="filterNeighborhood" placeholder="Ex: Centro" class="input-white" />
+              <v-select
+                v-model="filterNeighborhood"
+                :options="sabaraNeighborhoods"
+                placeholder="Selecione o Bairro..."
+                class="bg-white"
+              />
             </b-col>
             <b-col md="4" class="mb-3">
               <label class="label-clean">Categoria</label>
-              <v-select v-model="filterCategory" :options="categoryOptions" label="text" :reduce="op => op.value" placeholder="Selecione..." class="bg-white" />
+              <v-select v-model="filterCategory" :options="categoryOptions" label="text" :reduce="op => op.value" placeholder="Todas" class="bg-white" />
             </b-col>
             <b-col md="4" class="mb-3">
               <label class="label-clean">Status</label>
-              <v-select v-model="filterStatus" :options="statusOptions" label="text" :reduce="op => op.value" placeholder="Selecione..." class="bg-white" />
+              <v-select v-model="filterStatus" :options="statusOptions" label="text" :reduce="op => op.value" placeholder="Todos" class="bg-white" />
             </b-col>
           </b-row>
           <div class="text-right d-flex justify-content-end align-items-center">
@@ -76,20 +81,37 @@
 
     <div v-else-if="complaints.length === 0" class="text-center my-5 py-5 bg-white shadow-sm rounded">
       <inbox-icon size="48" class="text-muted mb-3" />
-      <h5 class="text-muted">Nada encontrado.</h5>
+      <h5 class="text-muted">Nenhuma ocorrência encontrada.</h5>
     </div>
 
     <b-row v-else>
       <b-col md="6" lg="4" v-for="c in complaints" :key="c.id" class="mb-4">
         <b-card no-body class="h-100 shadow-sm border-0 complaint-card">
+
           <div class="card-img-wrapper">
              <template v-if="c.imageUrl">
-                <video v-if="isVideo(c.imageUrl)" controls class="complaint-img" :src="resolveImageUrl(c.imageUrl)"></video>
-                <b-card-img-lazy v-else :src="resolveImageUrl(c.imageUrl)" top class="complaint-img"></b-card-img-lazy>
+                <div v-if="isVideo(c.imageUrl)" class="video-container">
+                  <video
+                    controls
+                    playsinline
+                    preload="metadata"
+                    class="complaint-video"
+                  >
+                    <source :src="resolveImageUrl(c.imageUrl)" type="video/mp4">
+                    Seu navegador não suporta vídeos.
+                  </video>
+                </div>
+                <b-card-img-lazy
+                  v-else
+                  :src="resolveImageUrl(c.imageUrl)"
+                  top
+                  class="complaint-img"
+                ></b-card-img-lazy>
              </template>
 
              <div v-else class="no-img-placeholder placeholder-gradient">
                 <h3 class="placeholder-text mb-2">FalaBará</h3>
+                <image-icon size="24" class="text-white-50" />
              </div>
 
              <span class="category-badge shadow-sm">{{ c.categoryName }}</span>
@@ -113,7 +135,10 @@
             </div>
 
             <h5 class="card-title font-weight-bold text-dark mb-1">{{ c.title }}</h5>
-            <h6 class="card-subtitle mb-3 text-muted small"><map-pin-icon size="12" class="text-danger" /> {{ c.neighborhood || 'Local não informado' }}</h6>
+            <h6 class="card-subtitle mb-3 text-muted small">
+              <map-pin-icon size="12" class="text-danger" />
+              {{ c.resolvedAddress || c.neighborhood || 'Local não informado' }}
+            </h6>
             <p class="card-text text-truncate-3 flex-grow-1 text-secondary">{{ c.description }}</p>
 
             <hr class="mt-3 mb-3 border-light">
@@ -140,12 +165,12 @@
 
 <script>
 import axios from '@/libs/axios'
-import { MapPinIcon, HeartIcon, RefreshCwIcon, SearchIcon, CalendarIcon, InboxIcon, FilterIcon, Trash2Icon } from 'vue-feather-icons'
+import { MapPinIcon, ImageIcon, HeartIcon, RefreshCwIcon, SearchIcon, CalendarIcon, InboxIcon, FilterIcon, Trash2Icon } from 'vue-feather-icons'
 import vSelect from 'vue-select'
 import 'vue-select/dist/vue-select.css'
 
 export default {
-  components: { MapPinIcon, HeartIcon, RefreshCwIcon, SearchIcon, CalendarIcon, InboxIcon, FilterIcon, Trash2Icon, vSelect },
+  components: { MapPinIcon, ImageIcon, HeartIcon, RefreshCwIcon, SearchIcon, CalendarIcon, InboxIcon, FilterIcon, Trash2Icon, vSelect },
   data () {
     return {
       complaints: [],
@@ -160,13 +185,21 @@ export default {
       filterStatus: null,
       filterNeighborhood: '',
       currentUserId: null,
+
+      sabaraNeighborhoods: [
+        'Centro', 'Nações Unidas', 'Siderúrgica', 'Alvorada', 'General Carneiro',
+        'Ana Lúcia', 'Santa Inês', 'Rosário', 'Fátima', 'Cabral',
+        'Vila Real', 'Nova Vista', 'Santo Antônio', 'Roça Grande',
+        'Itacolomi', 'Morada da Serra', 'Vila Rica', 'Pompéu', 'Ravenna'
+      ].sort(),
+
       categoryOptions: [{ value: 0, text: 'Saúde' }, { value: 1, text: 'Infraestrutura' }, { value: 2, text: 'Trânsito' }, { value: 3, text: 'Iluminação' }, { value: 4, text: 'Limpeza' }, { value: 5, text: 'Segurança' }, { value: 6, text: 'Educação' }, { value: 7, text: 'Meio Ambiente' }, { value: 8, text: 'Outros' }],
       statusOptions: [{ value: 0, text: 'Aberto' }, { value: 1, text: 'Em Análise' }, { value: 2, text: 'Em Andamento' }, { value: 3, text: 'Resolvido' }, { value: 4, text: 'Cancelado' }]
     }
   },
   computed: {
     hasActiveFilters () {
-      return this.filterNeighborhood !== '' || this.filterCategory !== null || this.filterStatus !== null
+      return (this.filterNeighborhood !== '' && this.filterNeighborhood !== null) || this.filterCategory !== null || this.filterStatus !== null
     }
   },
   mounted () { this.checkUser(); this.fetchComplaints() },
@@ -180,11 +213,13 @@ export default {
       }
     },
     isOwner (userId) {
-      // Verifica se o ID do autor do post é igual ao ID do usuário logado
       return this.currentUserId && String(userId) === this.currentUserId
     },
     resolveImageUrl (path) { if (!path) return null; return path.startsWith('http') ? path : `${this.apiBaseUrl}${path}` },
-    isVideo (url) { if (!url) return false; return ['mp4', 'mov', 'webm'].includes(url.split('.').pop().toLowerCase()) },
+    isVideo (url) {
+      if (!url) return false
+      return ['mp4', 'mov', 'webm', 'ogg', 'qt'].includes(url.split('.').pop().toLowerCase())
+    },
     setActiveTab (tab) { this.activeTab = tab; this.fetchComplaints(true) },
     onSearchInput () { if (this.searchTimeout) clearTimeout(this.searchTimeout); this.searchTimeout = setTimeout(() => { this.fetchComplaints(true) }, 500) },
 
@@ -206,15 +241,16 @@ export default {
           onlyMine: onlyMine
         }
 
-        if (this.filterNeighborhood) params.search = (params.search || '') + ' ' + this.filterNeighborhood
+        Object.keys(params).forEach(key => (params[key] === null || params[key] === '') && delete params[key])
 
-        Object.keys(params).forEach(key => params[key] === null && delete params[key])
         const token = localStorage.getItem('token')
         const config = { params: params, headers: {} }
         if (token) config.headers.Authorization = `Bearer ${token}`
 
         const { data } = await axios.get('/complaints/search', config)
         this.complaints = data.data
+
+        this.complaints.forEach(c => this.resolveAddress(c))
       } catch (error) {
         console.error(error)
         if (showLoader) this.$toast?.error('Erro ao carregar.')
@@ -222,6 +258,17 @@ export default {
         this.loading = false
       }
     },
+
+    async resolveAddress (complaint) {
+      if (!complaint.latitude || !complaint.longitude) return
+      try {
+        const res = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${complaint.latitude}&lon=${complaint.longitude}`)
+        if (res.data && res.data.display_name) {
+          this.$set(complaint, 'resolvedAddress', res.data.display_name.split(',')[0])
+        }
+      } catch (e) { }
+    },
+
     async vote (id) {
       const token = localStorage.getItem('token')
       if (!token) return this.$swal({ title: 'Entre para votar', icon: 'info' })
@@ -260,17 +307,16 @@ export default {
 .btn-icon-filter.filter-open { background-color: #e2e6ea; color: #8B0000; border-color: #dae0e5; }
 .btn-icon-filter.filter-applied { background-color: #8B0000; color: white; border-color: #8B0000; }
 .btn-icon-filter.filter-applied:hover { background-color: #660000; }
-
 .btn-refresh-square { background: linear-gradient(135deg, #8B0000 0%, #a01010 100%); border: none; color: white; border-radius: 8px; padding: 0.6rem 1.2rem; height: 42px; display: flex; align-items: center; }
-
 .complaint-card { border-radius: 12px; overflow: hidden; transition: transform 0.2s; }
-.card-img-wrapper { height: 200px; overflow: hidden; position: relative; background-color: #eee; }
+.card-img-wrapper { height: 250px; overflow: hidden; position: relative; background-color: #eee; }
 .complaint-img { width: 100%; height: 100%; object-fit: cover; }
+.video-container { width: 100%; height: 100%; background-color: black; display: flex; align-items: center; justify-content: center; }
+.complaint-video { width: 100%; height: 100%; object-fit: contain; }
 .category-badge { position: absolute; bottom: 10px; right: 10px; background: white; color: #8B0000; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.75rem; }
 .btn-delete-post { position: absolute; top: 10px; right: 10px; opacity: 0.9; z-index: 10; }
 .bg-light-gray { background-color: #fbfbfb; }
 
-/* ESTILO DO PLACEHOLDER MODERNO */
 .placeholder-gradient {
   background: linear-gradient(135deg, #8B0000 0%, #bd2130 100%);
   height: 100%;

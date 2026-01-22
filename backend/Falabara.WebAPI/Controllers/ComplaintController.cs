@@ -88,6 +88,7 @@ namespace Falabara.WebAPI.Controllers
         [HttpGet("search")]
         public async Task<IActionResult> Search(
             [FromQuery] string? search,
+            [FromQuery] string? neighborhood,
             [FromQuery] ComplaintCategory? category,
             [FromQuery] ComplaintStatus? status,
             [FromQuery] string? orderBy,
@@ -105,7 +106,7 @@ namespace Falabara.WebAPI.Controllers
                         return Unauthorized(new { message = "Faça login para ver suas reclamações." });
                     filtroUsuario = Guid.Parse(userIdString);
                 }
-                var query = new SearchComplaintsQuery(search, category, status, orderBy, filtroUsuario, page, perPage);
+                var query = new SearchComplaintsQuery(search, neighborhood, category, status, orderBy, filtroUsuario, page, perPage);
 
                 var result = await _mediator.Send(query);
                 return Ok(result);

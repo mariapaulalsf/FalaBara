@@ -72,9 +72,9 @@ namespace Falabara.Application.Queries.Complaint
             WHERE 
                 (@Search IS NULL OR (
                     c.""Title"" ILIKE '%' || @Search || '%' OR
-                    c.""Description"" ILIKE '%' || @Search || '%' OR
-                    c.""Neighborhood"" ILIKE '%' || @Search || '%'
+                    c.""Description"" ILIKE '%' || @Search || '%' 
                 ))
+                AND (@Neighborhood IS NULL OR c.""Neighborhood"" ILIKE '%' || @Neighborhood || '%')
                 AND (@Category IS NULL OR c.""Category"" = @Category)
                 AND (@Status IS NULL OR c.""Status"" = @Status)
                 AND (@UserId IS NULL OR c.""UserId"" = @UserId)
@@ -88,6 +88,7 @@ namespace Falabara.Application.Queries.Complaint
                 new
                 {
                     Search = request.Search,
+                    Neighborhood = request.Neighborhood,
                     Category = request.Category,
                     Status = request.Status,
                     UserId = request.UserId,

@@ -7,6 +7,8 @@ namespace Falabara.Application.Queries.Complaint
     public class SearchComplaintsQuery : IRequest<SearchComplaintsQueryResponse>
     {
         public string? Search { get; set; } 
+
+        public string? Neighborhood { get; set; }
         public ComplaintCategory? Category { get; set; }
         public ComplaintStatus? Status { get; set; }  
 
@@ -17,9 +19,10 @@ namespace Falabara.Application.Queries.Complaint
         public int Page { get; set; }
         public int PerPage { get; set; }
 
-        public SearchComplaintsQuery(string? search, ComplaintCategory? category, ComplaintStatus? status, string orderBy, Guid? userId, int page, int perPage)
+        public SearchComplaintsQuery(string? search, string? neighborhood, ComplaintCategory? category, ComplaintStatus? status, string orderBy, Guid? userId, int page, int perPage)
         {
             Search = search;
+            Neighborhood = neighborhood;
             Category = category;
             Status = status;
             OrderBy = orderBy?.ToLower() ?? "date";
