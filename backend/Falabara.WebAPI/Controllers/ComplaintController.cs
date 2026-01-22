@@ -98,15 +98,16 @@ namespace Falabara.WebAPI.Controllers
         {
             try
             {
-                Guid? filtroUsuario = null;
-                if (onlyMine)
+                var userIdString = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                Guid? loggedUserId = null;
+                
+                if (!string.IsNullOrEmpty(userIdString))
                 {
-                    var userIdString = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                    if (string.IsNullOrEmpty(userIdString))
-                        return Unauthorized(new { message = "Faça login para ver suas reclamações." });
-                    filtroUsuario = Guid.Parse(userIdString);
+                    loggedUserId = Guid.Parse(userIdString);
                 }
-                var query = new SearchComplaintsQuery(search, neighborhood, category, status, orderBy, filtroUsuario, page, perPage);
+
+                Guid? filtroUsuario = onlyMine ? loggedUserId : null;
+                var query = new SearchComplaintsQuery(search, neighborhood, category, status, orderBy, filtroUsuario, loggedUserId, page, perPage);
 
                 var result = await _mediator.Send(query);
                 return Ok(result);

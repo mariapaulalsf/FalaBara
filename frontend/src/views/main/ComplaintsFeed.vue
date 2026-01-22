@@ -145,16 +145,18 @@
 
             <div class="d-flex justify-content-between align-items-center">
               <small class="text-muted">Por: <strong>{{ c.authorName || 'Anônimo' }}</strong></small>
+
               <b-button
                 size="sm"
-                :variant="voting === c.id ? 'danger' : 'outline-danger'"
+                :variant="c.isLikedByCurrentUser ? 'danger' : 'outline-danger'"
                 class="btn-vote rounded-pill px-3"
-                @click="vote(c.id)"
+                @click="vote(c)"
                 :disabled="voting === c.id"
               >
-                <heart-icon size="14" :class="{ 'fill-current': voting === c.id }" />
+                <heart-icon size="14" :class="{ 'fill-current': c.isLikedByCurrentUser }" />
                 <span class="ml-1">{{ c.likesCount || 0 }}</span>
               </b-button>
+
             </div>
           </b-card-body>
         </b-card>
@@ -269,12 +271,30 @@ export default {
       } catch (e) { }
     },
 
-    async vote (id) {
+    async vote (complaint) {
       const token = localStorage.getItem('token')
       if (!token) return this.$swal({ title: 'Entre para votar', icon: 'info' })
-      this.voting = id
-      try { await axios.post(`/votes/${id}`, {}, { headers: { Authorization: `Bearer ${token}` } }); this.$toast.success('Voto ok!'); await this.fetchComplaints(false) } catch (e) { this.$toast.error('Erro ao votar') } finally { this.voting = null }
+
+      if (this.voting === complaint.id) return
+      this.voting = complaint.id
+
+      const previousState = complaint.isLikedByCurrentUser
+      const previousCount = complaint.likesCount
+
+      complaint.isLikedByCurrentUser = !previousState
+      complaint.likesCount += previousState ? -1 : 1
+
+      try {
+        await axios.post(`/votes/${complaint.id}`, {}, { headers: { Authorization: `Bearer ${token}` } })
+      } catch (e) {
+        complaint.isLikedByCurrentUser = previousState
+        complaint.likesCount = previousCount
+        this.$toast.error('Erro ao votar')
+      } finally {
+        this.voting = null
+      }
     },
+
     async deleteComplaint (id) {
       this.$swal({ title: 'Deseja excluir a reclamação?', text: 'Não é possível reverter essa ação!', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sim', cancelButtonText: 'Não' }).then(async (result) => {
         if (result.isConfirmed) {
@@ -333,5 +353,11 @@ export default {
 }
 .text-white-50 {
   color: rgba(255, 255, 255, 0.5);
+}
+.btn-danger .fill-current {
+  fill: white;
+}
+.btn-outline-danger .fill-current {
+  fill: #dc3545;
 }
 </style>

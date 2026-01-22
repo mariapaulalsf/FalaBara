@@ -14,12 +14,13 @@ namespace Falabara.Application.Queries.Complaint
 
         public string OrderBy { get; set; }  
 
-        public Guid? UserId { get; set; }
+        public Guid? UserId { get; set; } 
+        public Guid? CurrentUserId { get; set; } 
         
         public int Page { get; set; }
         public int PerPage { get; set; }
 
-        public SearchComplaintsQuery(string? search, string? neighborhood, ComplaintCategory? category, ComplaintStatus? status, string orderBy, Guid? userId, int page, int perPage)
+        public SearchComplaintsQuery(string? search, string? neighborhood, ComplaintCategory? category, ComplaintStatus? status, string orderBy, Guid? userId, Guid? currentUserId, int page, int perPage)
         {
             Search = search;
             Neighborhood = neighborhood;
@@ -27,6 +28,7 @@ namespace Falabara.Application.Queries.Complaint
             Status = status;
             OrderBy = orderBy?.ToLower() ?? "date";
             UserId = userId; 
+            CurrentUserId = currentUserId; 
             Page = page <= 0 ? 1 : page;
             PerPage = perPage <= 0 ? 10 : perPage;
         }
@@ -55,6 +57,8 @@ namespace Falabara.Application.Queries.Complaint
 
              public Guid AuthorId { get; set; }
             public string AuthorName { get; set; } 
+            public int LikesCount { get; set; }
+            public bool IsLikedByCurrentUser { get; set; }
             public string? OfficialResponse { get; set; }
             
             public int TotalItems { get; set; }

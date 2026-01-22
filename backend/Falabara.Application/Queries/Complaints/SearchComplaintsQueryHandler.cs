@@ -42,9 +42,13 @@ namespace Falabara.Application.Queries.Complaint
                 u.""name"" as AuthorName,
                 c.""UserId"" as AuthorId,
                 (SELECT COUNT(*) FROM ""Votes"" v WHERE v.""ComplaintId"" = c.""Id"" AND v.""IsLike"" = true) as LikesCount,
-                (SELECT COUNT(*) FROM ""Votes"" v WHERE v.""ComplaintId"" = c.""Id"" AND v.""IsLike"" = false) as DislikesCount,
+                CASE WHEN EXISTS (
+                    SELECT 1 FROM ""Votes"" v 
+                    WHERE v.""ComplaintId"" = c.""Id"" 
+                    AND v.""UserId"" = @CurrentUserId 
+                    AND v.""IsLike"" = true
+                ) THEN true ELSE false END as IsLikedByCurrentUser,
 
-                -- Tradução do Status
                 CASE 
                     WHEN c.""Status"" = 0 THEN 'Aberto'
                     WHEN c.""Status"" = 1 THEN 'Em Análise'
@@ -53,7 +57,6 @@ namespace Falabara.Application.Queries.Complaint
                     ELSE 'Cancelado'
                 END as StatusName,
 
-                -- Tradução da Categoria
                 CASE 
                     WHEN c.""Category"" = 0 THEN 'Saúde'
                     WHEN c.""Category"" = 1 THEN 'Obras/Infraestrutura'
@@ -82,7 +85,7 @@ namespace Falabara.Application.Queries.Complaint
             {orderByClause}
             
             LIMIT @PerPage OFFSET @Offset";
-
+            
             var result = await _dbConnection.QueryAsync<SearchComplaintsQueryResponse.ComplaintDto>(
                 sql,
                 new
@@ -92,6 +95,7 @@ namespace Falabara.Application.Queries.Complaint
                     Category = request.Category,
                     Status = request.Status,
                     UserId = request.UserId,
+                    CurrentUserId = request.CurrentUserId, 
                     PerPage = request.PerPage,
                     Offset = offset
                 });
