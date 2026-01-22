@@ -85,7 +85,7 @@
         <h1 class="display-4 font-weight-bold">Transforme Sabará com sua voz</h1>
         <p class="lead mb-4">Relate problemas, acompanhe soluções e ajude a prefeitura a priorizar.</p>
 
-        <b-button size="lg" variant="light" class="text-sabara font-weight-bold shadow" @click="goToNewComplaint">
+        <b-button size="lg" variant="light" class="text-sabara font-weight-bold shadow p-3" @click="goToNewComplaint">
           <plus-circle-icon /> REGISTRAR RECLAMAÇÃO
         </b-button>
       </b-container>
