@@ -10,6 +10,7 @@ using System.Text;
 using Microsoft.OpenApi.Models;
 using Npgsql;
 using System.Data;
+using Microsoft.AspNetCore.Http.Features; 
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,10 +21,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IComplaintRepository, ComplaintRepository>();
 builder.Services.AddScoped<IVoteRepository, VoteRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
-
 builder.Services.AddScoped<TokenService>();
-builder.Services.AddScoped<Falabara.Application.Services.IFileService,
-    Falabara.Application.Services.LocalFileService>();
+builder.Services.AddScoped<IFileService, LocalFileService>();
 
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(
@@ -57,11 +56,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "FalaBará API",
-        Version = "v1"
-    });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "FalaBará API", Version = "v1" });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -88,6 +83,14 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+
+builder.Services.Configure<FormOptions>(o =>
+{
+    o.ValueLengthLimit = int.MaxValue;
+    o.MultipartBodyLengthLimit = 200 * 1024 * 1024; // 200 MB
+    o.MemoryBufferThreshold = int.MaxValue;
+});
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -105,9 +108,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowAll");
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseStaticFiles();
+
 app.UseHttpsRedirection();
 
 app.MapControllers();

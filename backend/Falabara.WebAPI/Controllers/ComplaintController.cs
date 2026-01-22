@@ -19,8 +19,10 @@ namespace Falabara.WebAPI.Controllers
             _mediator = mediator;
         }
 
-       [Authorize]
+        [Authorize]
         [HttpPost]
+        [RequestSizeLimit(200 * 1024 * 1024)] 
+        [RequestFormLimits(MultipartBodyLengthLimit = 200 * 1024 * 1024)]
         public async Task<IActionResult> Create([FromForm] CreateComplaintRequest request)
         {
             try

@@ -87,7 +87,10 @@
                 <video v-if="isVideo(c.imageUrl)" controls class="complaint-img" :src="resolveImageUrl(c.imageUrl)"></video>
                 <b-card-img-lazy v-else :src="resolveImageUrl(c.imageUrl)" top class="complaint-img"></b-card-img-lazy>
              </template>
-             <div v-else class="no-img-placeholder"><image-icon size="40" class="text-muted-light" /></div>
+
+             <div v-else class="no-img-placeholder placeholder-gradient">
+                <h3 class="placeholder-text mb-2">FalaBará</h3>
+             </div>
 
              <span class="category-badge shadow-sm">{{ c.categoryName }}</span>
 
@@ -137,12 +140,12 @@
 
 <script>
 import axios from '@/libs/axios'
-import { MapPinIcon, ImageIcon, HeartIcon, RefreshCwIcon, SearchIcon, CalendarIcon, InboxIcon, FilterIcon, Trash2Icon } from 'vue-feather-icons'
+import { MapPinIcon, HeartIcon, RefreshCwIcon, SearchIcon, CalendarIcon, InboxIcon, FilterIcon, Trash2Icon } from 'vue-feather-icons'
 import vSelect from 'vue-select'
 import 'vue-select/dist/vue-select.css'
 
 export default {
-  components: { MapPinIcon, ImageIcon, HeartIcon, RefreshCwIcon, SearchIcon, CalendarIcon, InboxIcon, FilterIcon, Trash2Icon, vSelect },
+  components: { MapPinIcon, HeartIcon, RefreshCwIcon, SearchIcon, CalendarIcon, InboxIcon, FilterIcon, Trash2Icon, vSelect },
   data () {
     return {
       complaints: [],
@@ -177,6 +180,7 @@ export default {
       }
     },
     isOwner (userId) {
+      // Verifica se o ID do autor do post é igual ao ID do usuário logado
       return this.currentUserId && String(userId) === this.currentUserId
     },
     resolveImageUrl (path) { if (!path) return null; return path.startsWith('http') ? path : `${this.apiBaseUrl}${path}` },
@@ -263,12 +267,25 @@ export default {
 .card-img-wrapper { height: 200px; overflow: hidden; position: relative; background-color: #eee; }
 .complaint-img { width: 100%; height: 100%; object-fit: cover; }
 .category-badge { position: absolute; bottom: 10px; right: 10px; background: white; color: #8B0000; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.75rem; }
-.btn-delete-post {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  opacity: 0.9;
-  z-index: 10;
-}
+.btn-delete-post { position: absolute; top: 10px; right: 10px; opacity: 0.9; z-index: 10; }
 .bg-light-gray { background-color: #fbfbfb; }
+
+/* ESTILO DO PLACEHOLDER MODERNO */
+.placeholder-gradient {
+  background: linear-gradient(135deg, #8B0000 0%, #bd2130 100%);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+.placeholder-text {
+  font-family: 'Georgia', serif;
+  font-style: italic;
+  opacity: 0.9;
+}
+.text-white-50 {
+  color: rgba(255, 255, 255, 0.5);
+}
 </style>

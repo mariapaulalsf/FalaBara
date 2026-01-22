@@ -90,7 +90,7 @@
       </b-container>
     </div>
 
-    <b-card class="w-75 mx-auto">
+    <b-card class="w-75 mx-auto mt-3">
       <b-container class="py-5">
         <div>
           <h3 class="font-weight-bold mb-4 border-left-sabara p-2">Últimas Ocorrências</h3>
