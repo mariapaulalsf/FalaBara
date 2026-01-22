@@ -11,7 +11,8 @@
 
           <div v-if="isLoggedIn" class="d-flex align-items-center">
 
-            <b-nav-item-dropdown no-caret class="notification-dropdown mr-3" @show="markNotificationsAsRead">
+            <b-nav-item-dropdown no-caret right menu-class="notification-menu" class="notification-dropdown mr-3"
+              @show="markNotificationsAsRead">
               <template #button-content>
                 <div class="position-relative d-flex align-items-center">
                   <bell-icon size="20" class="text-white" />
@@ -29,15 +30,15 @@
                   <small>Nenhuma notificação.</small>
                 </div>
 
-                <b-dropdown-item v-for="n in notifications" :key="n.id" class="border-bottom" style="min-width: 300px;">
-                  <div class="d-flex flex-column py-2">
-                    <div class="d-flex justify-content-between">
-                      <strong :class="{ 'text-primary': !n.isRead, 'text-dark': n.isRead }">Sistema</strong>
-                      <small class="text-muted">{{ formatDate(n.createdAt) }}</small>
+                  <b-dropdown-item v-for="n in notifications" :key="n.id" class="notification-item" button>
+                    <div class="d-flex flex-column py-2">
+                      <div class="d-flex justify-content-between">
+                        <strong :class="{ 'text-primary': !n.isRead, 'text-dark': n.isRead }">Sistema</strong>
+                        <small class="text-muted">{{ formatDate(n.createdAt) }}</small>
+                      </div>
+                      <span class="text-secondary small mt-1 text-wrap" style="line-height: 1.4;">{{ n.message }}</span>
                     </div>
-                    <span class="text-secondary small mt-1 text-wrap" style="line-height: 1.4;">{{ n.message }}</span>
-                  </div>
-                </b-dropdown-item>
+                  </b-dropdown-item>
               </div>
             </b-nav-item-dropdown>
 
@@ -215,7 +216,7 @@ export default {
       try {
         const token = localStorage.getItem('token')
         const config = { headers: { Authorization: `Bearer ${token}` } }
-        const { data } = await axios.get('/api/notifications', config)
+        const { data } = await axios.get('/notifications', config)
         this.notifications = data
       } catch (error) {
         console.error('Erro ao buscar notificações', error)
@@ -229,7 +230,7 @@ export default {
         const token = localStorage.getItem('token')
         const config = { headers: { Authorization: `Bearer ${token}` } }
 
-        await axios.post('/api/notifications/read-all', {}, config)
+        await axios.post('/notifications/read-all', {}, config)
 
         this.notifications.forEach(n => {
           n.isRead = true
@@ -360,6 +361,15 @@ export default {
   right: 0;
   left: auto;
 }
+.notification-item {
+  cursor: default;
+}
+
+.notification-item:active,
+.notification-item:focus {
+  background-color: #f8f9fa !important;
+  color: inherit !important;
+}
 
 .bg-light-sabara {
   background-color: #fce8e8;
@@ -383,6 +393,14 @@ export default {
 .notification-list-container {
   max-height: 300px;
   overflow-y: auto;
+}
+
+.notification-menu {
+  width: 360px;
+  max-width: 90vw;
+  right: 0 !important;
+  left: auto !important;
+  padding: 0;
 }
 
 .hero {
