@@ -48,14 +48,13 @@
           </div>
         </b-nav-item-dropdown>
         <b-navbar-nav class="w-100 d-flex align-items-center justify-content-between">
-          
+
           <div class="d-none d-lg-block" style="flex: 1;"></div>
 
           <div v-if="isLoggedIn" class="navbar-center-text">
             <span class="text-white font-weight-medium">Olá, {{ userName }}</span>
           </div>
-          
-          
+
           <div v-else style="flex: 1;"></div>
 
           <div class="d-flex align-items-center justify-content-end" style="flex: 1;">
@@ -208,7 +207,7 @@ export default {
 
 <style scoped>
 .custom-navbar {
-  min-height: 80px; 
+  min-height: 80px;
 }
 
 @media (min-width: 992px) {
@@ -217,7 +216,7 @@ export default {
     right: 3%;
     transform: translateX(-50%);
     white-space: nowrap;
-    font-size: 1.1rem; 
+    font-size: 1.1rem;
   }
 }
 
@@ -237,10 +236,10 @@ export default {
   overflow-y: auto;
 }
 .hero {
-  
-  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
                     url("../../../public/Bairro-Pompeu.jpg");
-  
+
   background-size: cover;      /* Faz a imagem cobrir todo o espaço */
   background-position: center; /* Centraliza a imagem */
   background-repeat: no-repeat;
@@ -252,13 +251,13 @@ export default {
 }
 
 .content-overlay {
-  z-index: 2;                  
+  z-index: 2;
 }
 .img_inicio {
   height: 540px;
 }
 .bg-sabara { background-color: #8B0000; }
-.text-sabara { color: white; 
+.text-sabara { color: white;
 background-color: #8B0000;
 border: #8B0000;}
 .border-left-sabara { border-left: 5px solid #8B0000; }
@@ -280,9 +279,9 @@ border: #8B0000;}
   max-height: 300px;
   overflow-y: auto;
 }
-.cursor-pointer { 
+.cursor-pointer {
   color: white !important;
-  cursor: pointer; 
+  cursor: pointer;
   border: solid, #8B0000;
   background-color: #8B0000;
   padding: 7px;

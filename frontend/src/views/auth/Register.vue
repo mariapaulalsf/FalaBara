@@ -24,11 +24,11 @@
         </b-form-group>
 
         <div class="d-flex justify-content-center">
-          <b-button 
-            type="submit" 
-            :disabled="loading" 
+          <b-button
+            type="submit"
+            :disabled="loading"
             class="mt-3 bg-sabara border-0 d-flex align-items-center justify-content-center"
-            style="min-width: 200px;" 
+            style="min-width: 200px;"
           >
             {{ loading ? 'Criando...' : 'Cadastrar' }}
           </b-button>
