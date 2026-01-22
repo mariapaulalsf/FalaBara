@@ -276,7 +276,7 @@ export default {
       try { await axios.post(`/votes/${id}`, {}, { headers: { Authorization: `Bearer ${token}` } }); this.$toast.success('Voto ok!'); await this.fetchComplaints(false) } catch (e) { this.$toast.error('Erro ao votar') } finally { this.voting = null }
     },
     async deleteComplaint (id) {
-      this.$swal({ title: 'Excluir?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sim', cancelButtonText: 'Não' }).then(async (result) => {
+      this.$swal({ title: 'Deseja excluir a reclamação?', text: 'Não é possível reverter essa ação!', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sim', cancelButtonText: 'Não' }).then(async (result) => {
         if (result.isConfirmed) {
           try {
             const token = localStorage.getItem('token')

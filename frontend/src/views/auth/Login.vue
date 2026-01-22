@@ -45,15 +45,24 @@ export default {
     async handleLogin () {
       this.loading = true
       try {
-        // Ajuste a URL conforme seu backend (ex: /auth/login)
         const { data } = await axios.post('/auth/login', this.form)
 
-        // Salva o Token
+        // 1. Salva o Token
         localStorage.setItem('token', data.token)
 
-        // Redireciona para a Home ou Dashboard
-        this.$toast.success(`Bem-vindo, ${data.user?.name || 'Cidadão'}!`)
-        this.$router.push({ name: 'landing' }) // Ou 'home'
+        // 2. CORREÇÃO: Salva os dados do usuário para a LandingPage usar
+        // O backend retorna: { token, id, nome, email, tipo }
+        const userData = {
+          id: data.id,
+          nome: data.nome,
+          email: data.email,
+          role: data.tipo
+        }
+        localStorage.setItem('userData', JSON.stringify(userData))
+
+        // Redireciona
+        this.$toast.success(`Bem-vindo, ${data.nome || 'Cidadão'}!`)
+        this.$router.push({ name: 'landing' })
       } catch (error) {
         const msg = error.response?.data?.message || 'Email ou senha inválidos.'
         this.$toast.error(msg)
