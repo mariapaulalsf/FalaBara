@@ -20,7 +20,7 @@
           </template>
 
           <b-dropdown-header class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
-              <span class="font-weight-bold text-dark">Notificações</span>
+              <span class="font-weight-bold text-dark me-3">Notificações</span>
               <small class="text-muted cursor-pointer" @click="fetchNotifications">Atualizar</small>
           </b-dropdown-header>
 
@@ -280,5 +280,16 @@ border: #8B0000;}
   max-height: 300px;
   overflow-y: auto;
 }
-.cursor-pointer { cursor: pointer; }
+.cursor-pointer { 
+  color: white !important;
+  cursor: pointer; 
+  border: solid, #8B0000;
+  background-color: #8B0000;
+  padding: 7px;
+  border-radius: 5px;
+}
+.cursor-pointer:hover {
+  background-color: white;
+  color: black !important;
+}
 </style>
