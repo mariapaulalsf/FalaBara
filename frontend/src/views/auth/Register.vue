@@ -1,9 +1,9 @@
 <template>
-  <div class="auth-wrapper d-flex align-items-center justify-content-center py-5" style="min-height: 100vh">
+  <div class="Tela auth-wrapper d-flex align-items-center justify-content-center py-5" style="min-height: 100vh">
     <b-card class="shadow p-4 border-0 card_login" style="max-width: 400px; width: 100%">
-      <div class="text-center mb-4">
+      <div class="text-center header_card">
         <h3 class="font-weight-bold text-sabara">Criar Conta</h3>
-        <p class="text-muted">Junte-se ao FalaBará</p>
+        <p class="text-white">Junte-se ao FalaBará</p>
       </div>
 
       <b-form @submit.prevent="handleRegister" class="text-white">
@@ -23,9 +23,16 @@
           <b-form-input type="password" v-model="form.password" required placeholder="Senha (8 Digitos)"/>
         </b-form-group>
 
-        <b-button type="submit" block :disabled="loading" class="mt-4 bg-sabara border-0 ">
-          {{ loading ? 'Criando...' : 'Cadastrar' }}
-        </b-button>
+        <div class="d-flex justify-content-center">
+          <b-button 
+            type="submit" 
+            :disabled="loading" 
+            class="mt-3 bg-sabara border-0 d-flex align-items-center justify-content-center"
+            style="min-width: 200px;" 
+          >
+            {{ loading ? 'Criando...' : 'Cadastrar' }}
+          </b-button>
+        </div>
       </b-form>
 
       <div class="text-center mt-3 text-white">
@@ -78,6 +85,18 @@ export default {
 }
 </script>
 <style scoped>
+  .Tela{
+    background-color: rgb(27, 25, 25);
+  }
+.header_card{
+  position: relative;
+  border-radius: 7px 7px 0 0;
+  padding-top: 30px;
+  right: 40px;
+  bottom: 40px;
+  background-color: #8B0000;
+  width: 400px !important;
+}
 #faca_login {
   text-decoration: none;
   color: white;
@@ -87,11 +106,10 @@ export default {
   color: #8B0000;
 }
 .card_login{
-  background-color: #534a4f;
+  background-color: #474345;
 }
 .bg-sabara {
   background-color: #8B0000;
-  margin: auto  !important;;
 }
 .text-sabara { color: white; }
 </style>
