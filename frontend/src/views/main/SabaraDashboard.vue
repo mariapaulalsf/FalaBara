@@ -1,13 +1,13 @@
 <template>
   <div class="sabara-dashboard p-3">
-    <b-card class="p-2">
+    <b-card class="p-2 border-0">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="text-sabara font-weight-bold d-flex align-items-center">
           <bar-chart-2-icon size="24" class="mr-1" />
           Painel da Cidade
         </h4>
-        <b-button size="sm" variant="outline-secondary" @click="fetchAllData">
-          <refresh-cw-icon size="16" :class="{ 'spin-icon': loading }" />
+        <b-button size="sm" class="bt_atualizar p-2" variant="outline-secondary" @click="fetchAllData">
+          <refresh-cw-icon size="16" :class="{ 'spin-icon': loading }" class="me-1"/>
           Atualizar
         </b-button>
       </div>
@@ -48,7 +48,7 @@
           <b-col cols="12">
             <b-card
               title="Mapa de Calor de Problemas"
-              class="shadow-sm border-0"
+              class="shadow-sm border-0 mt-3"
             >
               <p class="text-muted small">
                 Regiões com maior concentração de reclamações em aberto.
@@ -246,6 +246,11 @@ export default {
 </script>
 
 <style scoped>
+.bt_atualizar{
+  background-color: #8b0000;
+  color: white;
+  font-size: 1em;
+}
 .painel {
   background-image: linear-gradient(70deg,#6D0C0C,#B11313);
 }
@@ -262,7 +267,7 @@ export default {
   margin-bottom: 1rem;
 }
 .border-left-sabara {
-  border-left: 5px solid #8b0000;
+  border-left: 5px solid #0F52BA;
 }
 .border-left-warning {
   border-left: 5px solid #ff9f43;

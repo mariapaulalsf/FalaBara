@@ -8,7 +8,7 @@
 
       <b-form @submit.prevent="handleRegister" class="text-white">
         <b-form-group label="Nome" class="m-2">
-          <b-form-input v-model="form.name" required />
+          <b-form-input v-model="form.name" placeholder="Nome" required />
         </b-form-group>
 
         <b-form-group label="CPF" class="m-2">
@@ -16,11 +16,11 @@
         </b-form-group>
 
         <b-form-group label="E-mail" class="m-2">
-          <b-form-input type="email" v-model="form.email" required />
+          <b-form-input type="email" v-model="form.email" required placeholder="SeuEmail@gmail.com"/>
         </b-form-group>
 
         <b-form-group label="Senha" class="m-2">
-          <b-form-input type="password" v-model="form.password" required />
+          <b-form-input type="password" v-model="form.password" required placeholder="Senha (8 Digitos)"/>
         </b-form-group>
 
         <b-button type="submit" block :disabled="loading" class="mt-4 bg-sabara border-0 ">
@@ -84,11 +84,14 @@ export default {
 }
 #faca_login:hover{
   text-decoration: underline;
-  color: blue;
+  color: #8B0000;
 }
 .card_login{
   background-color: #534a4f;
 }
-.bg-sabara { background-color: #8B0000; }
+.bg-sabara {
+  background-color: #8B0000;
+  margin: auto  !important;;
+}
 .text-sabara { color: white; }
 </style>

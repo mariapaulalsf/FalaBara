@@ -12,7 +12,7 @@
     <b-card no-body class="mb-4 shadow-sm border-0">
       <div class="p-3">
         <b-row class="align-items-center">
-          <b-col cols="12" md="6" class="mb-2 mb-md-0">
+          <b-col cols="12" md="8" class="mb-2 mb-md-0">
             <div class="search-wrapper">
               <search-icon size="18" class="search-icon-input" />
               <b-form-input
@@ -24,11 +24,11 @@
             </div>
           </b-col>
 
-          <b-col cols="12" md="6" class="d-flex justify-content-md-end justify-content-between align-items-center">
+          <b-col cols="12" md="4" class="d-flex justify-content-md-end justify-content-between align-items-center">
             <div class="d-flex align-items-center">
               <b-button
                 variant="flat-primary"
-                class="btn-icon-filter mr-3"
+                class="btn-icon-filter me-2"
                 :class="{
                   'filter-applied': hasActiveFilters,
                   'filter-open': isFilterActive
@@ -65,8 +65,8 @@
             </b-col>
           </b-row>
           <div class="text-right d-flex justify-content-end align-items-center">
-             <b-button variant="light" class="text-muted mr-3" size="sm" @click="clearFilters">Limpar</b-button>
-             <b-button variant="danger" size="sm" class="px-4" @click="fetchComplaints(true)">Aplicar Filtros</b-button>
+             <b-button variant="light" class="text-muted m-3 p-2" size="sm" @click="clearFilters">Limpar</b-button>
+             <b-button variant="danger" size="sm" class="px-4 p-2" @click="fetchComplaints(true)">Aplicar Filtros</b-button>
           </div>
         </div>
       </b-collapse>
