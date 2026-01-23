@@ -1,16 +1,15 @@
 <template>
   <div class="landing-page modern-ui">
-    <b-navbar toggleable="lg" type="dark" variant="dark" class="p-3 custom-navbar glass-navbar">
-      <img src="../../../public/megafone (1).png" alt="Megaphone" class="me-2 ps-3">
+    <b-navbar toggleable="lg" type="dark" variant="dark" class="px-4 py-3 custom-navbar glass-navbar">
       <b-navbar-brand href="#" class="font-weight-bold brand-logo">FalaBará</b-navbar-brand>
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
       <b-collapse id="nav-collapse" is-nav>
-        <b-navbar-nav class="ml-auto d-flex justify-content-end w-100">
-          <div v-if="isLoggedIn" class="d-flex align-items-center">
-            <b-nav-item-dropdown no-caret right menu-class=" shadow-lg border-0 rounded-lg"
-              class="notification-dropdown me-3" @show="markNotificationsAsRead">
+        <b-navbar-nav class="ml-auto d-flex align-items-center justify-content-end w-100">
+          <div v-if="isLoggedIn" class="d-flex align-items-center gap-3">
+            <b-nav-item-dropdown no-caret right menu-class="notification-menu shadow-lg border-0 rounded-lg"
+              class="notification-dropdown mr-3" @show="markNotificationsAsRead">
               <template #button-content>
-                <div class="icon-wrapper  d-flex align-items-center justify-content-center">
+                <div class="icon-wrapper position-relative d-flex align-items-center justify-content-center">
                   <bell-icon size="20" class="text-white" />
                   <span v-if="unreadCount > 0" class="notification-badge">{{ unreadCount }}</span>
                 </div>
@@ -19,7 +18,7 @@
                 class="d-flex justify-content-between align-items-center px-3 py-3 border-bottom bg-white rounded-top">
                 <span class="font-weight-bold text-dark h6 mb-0">Notificações</span>
               </b-dropdown-header>
-              <div class="notification-list-container custom-scrollbar ms-n1">
+              <div class="notification-list-container custom-scrollbar">
                 <div v-if="notifications.length === 0" class="text-center p-4 text-muted">
                   <small>Nenhuma notificação recente.</small>
                 </div>
@@ -40,7 +39,7 @@
             <b-nav-item-dropdown no-caret class="user-dropdown" menu-class="shadow-lg border-0 rounded-lg mt-2 me-4">
               <template #button-content>
                 <div class="d-flex align-items-center text-white user-btn">
-                  <span class="font-weight-bold me-2 d-none d-md-inline">{{ userName }}</span>
+                  <span class="font-weight-bold mr-2 d-none d-md-inline">{{ userName }}</span>
                   <div class="user-avatar shadow-sm">
                     <user-icon size="18" />
                   </div>
@@ -54,9 +53,9 @@
                 Sair</b-dropdown-item>
             </b-nav-item-dropdown>
           </div>
-          <div v-else class="d-flex align-items-center ml-auto auth-buttons">
+          <div v-else class="d-flex align-items-center ml-auto auth-buttons gap-3">
             <b-button variant="outline-light" :to="{ name: 'auth-login' }"
-              class="px-4 btn-semi-rounded font-weight-bold me-3">Entrar</b-button>
+              class="px-4 btn-semi-rounded font-weight-bold mr-3">Entrar</b-button>
             <b-button variant="light" :to="{ name: 'auth-register' }"
               class="px-4 btn-semi-rounded font-weight-bold text-sabara">Cadastrar</b-button>
           </div>
@@ -68,8 +67,8 @@
       <b-container class="content-overlay">
         <h1 class="display-4 font-weight-bold">Transforme Sabará com sua voz</h1>
         <p class="lead mb-4">Relate problemas, acompanhe soluções e ajude a prefeitura a priorizar.</p>
-        <b-button size="lg" class="text-sabara font-weight-bold shadow p-3" @click="goToNewComplaint">
-          <plus-circle-icon /> REGISTRAR RECLAMAÇÃO
+        <b-button size="lg" variant="danger" class="btn-cta-red font-weight-bold shadow p-3" @click="goToNewComplaint">
+          <plus-circle-icon class="mr-2" /> REGISTRAR RECLAMAÇÃO
         </b-button>
       </b-container>
     </div>
@@ -103,26 +102,24 @@
             </b-button>
           </div>
 
-          <div class="search-bar-container p-2 mb-4 bg-light rounded-lg">
-            <b-row align-v="center" class="mx-0">
-              <b-col md="8" class="pl-0 pr-md-2 mb-2 mb-md-0">
-                <div class="modern-search-wrapper d-flex align-items-center bg-white shadow-sm rounded-lg px-3 py-2">
-                  <search-icon size="18" class="text-muted mr-3" />
-                  <input type="text" class="border-0 w-100 bg-transparent text-dark" style="outline: none;"
-                    placeholder="Pesquisar por nome, email ou CPF..." v-model="filters.search"
-                    @input="handleSearchInput">
-                </div>
-              </b-col>
+          <b-card no-body class="mb-4 shadow-sm border-0 bg-light rounded-lg">
+            <div class="p-2">
+              <b-row align-v="center" class="mx-0">
+                <b-col md="8" class="pl-0 pr-md-2 mb-2 mb-md-0">
+                  <div class="search-wrapper position-relative">
+                    <search-icon size="18" class="search-icon-input" />
+                    <b-form-input v-model="filters.search" placeholder="Pesquisar por nome, email ou CPF..."
+                      class="input-clean bg-white border-0 shadow-sm" @input="handleSearchInput" />
+                  </div>
+                </b-col>
 
-              <b-col md="4" class="pr-0 pl-md-2">
-                <div class="modern-select-wrapper bg-white shadow-sm rounded-lg">
+                <b-col md="4" class="pr-0 pl-md-2">
                   <b-form-select v-model="filters.type" :options="filterRoleOptions"
-                    class="border-0 shadow-none h-100 py-2" style="border-radius: 8px;"
-                    @change="fetchUsers"></b-form-select>
-                </div>
-              </b-col>
-            </b-row>
-          </div>
+                    class="input-filter-select shadow-sm" @change="fetchUsers" />
+                </b-col>
+              </b-row>
+            </div>
+          </b-card>
 
           <b-card no-body class="border-0 shadow-sm rounded-lg overflow-hidden">
             <b-table responsive hover striped :items="users" :fields="tableColumns" primary-key="id" show-empty
@@ -170,22 +167,26 @@
         <h5 class="font-weight-bold mb-0 text-dark">{{ userName }}</h5>
       </div>
       <b-form @submit.prevent="updateProfile">
-        <b-form-group label="Nome Completo" class="font-weight-bold text-muted small text-uppercase">
-          <b-form-input v-model="profileForm.name" required class="input-modern"></b-form-input>
+        <b-form-group label="Nome Completo" label-for="profile-name"
+          class="font-weight-bold text-muted small text-uppercase">
+          <b-form-input id="profile-name" v-model="profileForm.name" required class="input-modern"></b-form-input>
         </b-form-group>
-        <b-form-group label="Telefone (WhatsApp)" class="mt-3 font-weight-bold text-muted small text-uppercase">
-          <b-form-input v-model="profileForm.foneNumber" class="input-modern"></b-form-input>
+        <b-form-group label="Telefone (WhatsApp)" label-for="profile-phone"
+          description="Opcional. Usado para contato rápido."
+          class="mt-3 font-weight-bold text-muted small text-uppercase">
+          <b-form-input id="profile-phone" v-model="profileForm.foneNumber" placeholder="(31) 99999-9999"
+            class="input-modern"></b-form-input>
         </b-form-group>
         <b-row>
           <b-col md="6"><b-form-group label="E-mail"
-              class="mt-3 font-weight-bold text-muted small text-uppercase"><b-form-input :value="userEmail" disabled
-                class="bg-light border-0"></b-form-input></b-form-group></b-col>
+              class="mt-3 font-weight-bold text-muted small text-uppercase"><b-form-input id="profile-email"
+                :value="userEmail" readonly class="input-disabled"></b-form-input></b-form-group></b-col>
           <b-col md="6"><b-form-group label="CPF"
-              class="mt-3 font-weight-bold text-muted small text-uppercase"><b-form-input :value="userCpf" disabled
-                class="bg-light border-0"></b-form-input></b-form-group></b-col>
+              class="mt-3 font-weight-bold text-muted small text-uppercase"><b-form-input id="profile-cpf"
+                :value="userCpf" readonly class="input-disabled"></b-form-input></b-form-group></b-col>
         </b-row>
-        <div class="d-flex justify-content-end align-items-center mt-4 pt-3 border-top modal-footer-actions">
-          <b-button variant="light" class="font-weight-bold text-muted btn-semi-rounded"
+        <div class="d-flex justify-content-end align-items-center mt-4 pt-3 border-top modal-footer-actions gap-2">
+          <b-button variant="light" class="font-weight-bold text-muted btn-semi-rounded mr-2"
             @click="$bvModal.hide('profile-modal')">Cancelar</b-button>
           <b-button type="submit" variant="success" class="px-4 font-weight-bold shadow-sm btn-semi-rounded"
             :disabled="profileLoading"><b-spinner small v-if="profileLoading" class="mr-1"></b-spinner> Salvar
@@ -226,11 +227,11 @@
                 :options="roleOptions" class="input-modern form-control"></b-form-select></b-form-group></b-col>
         </b-row>
         <b-row class="mt-3" v-if="createUserForm.role === 2"><b-col md="12"><b-form-group label="Departamento"
-              class="font-weight-bold text-muted small text-uppercase text-sabaras"><b-form-select
+              class="font-weight-bold text-muted small text-uppercase text-sabara"><b-form-select
                 v-model="createUserForm.department" :options="departmentOptions" class="input-modern form-control"
                 required></b-form-select></b-form-group></b-col></b-row>
-        <div class="d-flex justify-content-end align-items-center mt-4 pt-3 border-top modal-footer-actions">
-          <b-button variant="light" class="font-weight-bold text-muted btn-semi-rounded"
+        <div class="d-flex justify-content-end align-items-center mt-4 pt-3 border-top modal-footer-actions gap-2">
+          <b-button variant="light" class="font-weight-bold text-muted btn-semi-rounded mr-2"
             @click="$bvModal.hide('create-user-modal')">Cancelar</b-button>
           <b-button type="submit" variant="success" class="px-4 font-weight-bold shadow-sm btn-semi-rounded"
             :disabled="createLoading"><b-spinner small v-if="createLoading" class="mr-1"></b-spinner>
@@ -274,8 +275,6 @@ export default {
         { key: 'department', label: 'Departamento', sortable: false }
       ],
       users: [],
-
-      // --- FILTROS ---
       filters: {
         search: '',
         type: null
@@ -285,8 +284,6 @@ export default {
         { value: 1, text: 'Cidadão' },
         { value: 2, text: 'Prefeitura' }
       ],
-
-      // --- CRIAÇÃO ---
       createLoading: false,
       createUserForm: { name: '', cpf: '', email: '', phone: '', password: '', role: 1, department: null },
       roleOptions: [{ value: 1, text: 'Cidadão' }, { value: 2, text: 'Prefeitura (Admin)' }],
@@ -324,7 +321,7 @@ export default {
           this.userName = userData.nome || userData.name || 'Cidadão'
           this.userEmail = userData.email || ''
           this.userCpf = userData.cpf || ''
-          this.userType = userData.role || ''
+          this.userType = userData.role || userData.userType || userData.type
           this.profileForm.name = this.userName
         } catch (e) { this.logout() }
       }
@@ -415,9 +412,33 @@ export default {
       } catch (error) { console.error(error) }
     },
     async openProfileModal () {
-      this.$bvModal.show('profile-modal')
+      try {
+        const userDataStr = localStorage.getItem('userData')
+        if (!userDataStr) { this.logout(); return }
+        const userData = JSON.parse(userDataStr)
+        const userId = userData.id || userData.Id
+        const token = localStorage.getItem('token')
+        const { data } = await axios.get(`/users/${userId}`, { headers: { Authorization: `Bearer ${token}` } })
+        this.profileForm.name = data.name
+        this.profileForm.foneNumber = data.foneNumber || ''
+        this.userCpf = data.cpf
+        this.userEmail = data.email
+        this.$bvModal.show('profile-modal')
+      } catch (error) { this.$toast.error('Erro ao carregar perfil.') }
     },
     async updateProfile () {
+      this.profileLoading = true
+      try {
+        const token = localStorage.getItem('token')
+        const payload = { Nome: this.profileForm.name, FoneNumber: this.profileForm.foneNumber }
+        await axios.put('/users/update', payload, { headers: { Authorization: `Bearer ${token}` } })
+        this.$toast.success('Perfil atualizado!')
+        this.userName = this.profileForm.name
+        const userData = JSON.parse(localStorage.getItem('userData'))
+        userData.nome = this.profileForm.name
+        localStorage.setItem('userData', JSON.stringify(userData))
+        this.$bvModal.hide('profile-modal')
+      } catch (error) { this.$toast.error('Erro ao atualizar.') } finally { this.profileLoading = false }
     },
     goToNewComplaint () {
       if (this.isLoggedIn) this.$router.push({ name: 'register-complaint' })
@@ -432,9 +453,7 @@ export default {
       localStorage.removeItem('userData')
       this.isLoggedIn = false
       this.$toast.info('Até logo! Saindo...')
-      setTimeout(() => {
-        window.location.reload()
-      }, 500)
+      setTimeout(() => { window.location.reload() }, 500)
     },
     formatDate (date) {
       if (!date) return ''
@@ -449,7 +468,7 @@ export default {
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 .modern-ui {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: #f8f9fa;
   min-height: 100vh;
 }
@@ -468,23 +487,72 @@ export default {
 .user-table th {
   border-top: none !important;
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: #b9b9c3;
-  background-color: #fff;
   padding: 1.2rem 1rem;
+  background-color: #ffffff;
 }
 
 .user-table td {
   padding: 1rem;
   vertical-align: middle;
-  color: #6e6b7b;
   font-size: 0.9rem;
+  color: #6e6b7b;
 }
 
 .user-table thead th:focus {
   outline: none;
+}
+
+.search-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.search-icon-input {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+}
+
+.input-clean {
+  border-radius: 20px;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  padding-left: 40px;
+  height: 45px;
+  transition: all 0.2s ease;
+}
+
+.input-clean:focus {
+  background-color: #ffffff;
+  border-color: #8B0000;
+  box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.12);
+}
+
+.input-filter-select {
+  height: 45px;
+  border-radius: 8px;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  padding: 0 14px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #495057;
+  transition: all 0.2s ease;
+}
+
+.input-filter-select:focus {
+  border-color: #8B0000;
+  box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.12);
+}
+
+.input-filter-select.custom-select {
+  background-image: none;
 }
 
 .input-modern {
@@ -500,14 +568,43 @@ export default {
   box-shadow: none;
 }
 
+.input-disabled {
+  background-color: #f5f5f5 !important;
+  color: #6c757d !important;
+  border-color: #eee !important;
+  cursor: default !important;
+  pointer-events: none;
+}
+
+.btn-cta-red {
+  background-color: #8B0000 !important;
+  border-color: #8B0000 !important;
+  color: white !important;
+}
+
+.btn-cta-red:hover {
+  background-color: #a01010 !important;
+  border-color: #a01010 !important;
+}
+
+.btn-semi-rounded {
+  border-radius: 8px !important;
+}
+
+.gap-3 {
+  gap: 1rem;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
 .bg-light-sabara {
   background-color: #fff0f0;
 }
 
 .text-sabara {
-  color: white;
-  background-color: #8B0000;
-  border: #8B0000;
+  color: #8B0000;
 }
 
 .bg-sabara {
@@ -555,6 +652,16 @@ export default {
   border: 2px solid #343a40;
 }
 
+::v-deep .dropdown-item:active {
+  background-color: #f8f9fa !important;
+  color: #212529 !important;
+}
+
+::v-deep .dropdown-item:hover {
+  background-color: #f1f1f1 !important;
+  color: #212529 !important;
+}
+
 .hero {
   background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("../../../public/Bairro-Pompeu.jpg");
   background-size: cover;
@@ -568,10 +675,6 @@ export default {
 
 .content-overlay {
   z-index: 2;
-}
-
-.btn-cta {
-  border-radius: 0.25rem !important;
 }
 
 .main-content-wrapper {
@@ -625,13 +728,5 @@ export default {
 
 .cursor-pointer {
   cursor: pointer;
-}
-
-.btn-semi-rounded {
-  border-radius: 8px !important;
-}
-.text-sabara:hover {
-  background-color: white;
-  color: #8B0000;
 }
 </style>

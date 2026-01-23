@@ -61,8 +61,7 @@
           </b-row>
           <div class="text-right d-flex justify-content-end align-items-center">
             <b-button variant="light" class="text-muted m-3 p-2" size="sm" @click="clearFilters">Limpar</b-button>
-            <b-button variant="danger" size="sm" class="px-4 p-2" @click="fetchComplaints(true)">Aplicar
-              Filtros</b-button>
+            <b-button variant="danger" size="sm" class="px-4 p-2" @click="resetPageAndFetch">Aplicar Filtros</b-button>
           </div>
         </div>
       </b-collapse>
@@ -75,73 +74,80 @@
       <h5 class="text-muted">Nenhuma ocorrência encontrada.</h5>
     </div>
 
-    <b-row v-else>
-      <b-col md="6" lg="4" v-for="c in complaints" :key="c.id" class="mb-4">
-        <b-card no-body class="h-100 shadow-sm border-0 complaint-card">
+    <div v-else>
+      <b-row>
+        <b-col md="6" lg="4" v-for="c in complaints" :key="c.id" class="mb-4">
+          <b-card no-body class="h-100 shadow-sm border-0 complaint-card">
 
-          <div class="card-img-wrapper">
-            <template v-if="c.imageUrl">
-              <div v-if="isVideo(c.imageUrl)" class="video-container">
-                <video controls playsinline preload="metadata" class="complaint-video">
-                  <source :src="resolveImageUrl(c.imageUrl)" type="video/mp4">
-                </video>
+            <div class="card-img-wrapper">
+              <template v-if="c.imageUrl">
+                <div v-if="isVideo(c.imageUrl)" class="video-container">
+                  <video controls playsinline preload="metadata" class="complaint-video">
+                    <source :src="resolveImageUrl(c.imageUrl)" type="video/mp4">
+                  </video>
+                </div>
+                <b-card-img-lazy v-else :src="resolveImageUrl(c.imageUrl)" top class="complaint-img"></b-card-img-lazy>
+              </template>
+              <div v-else class="no-img-placeholder placeholder-gradient">
+                <h3 class="placeholder-text mb-2">FalaBará</h3>
+                <image-icon size="24" class="text-white-50" />
               </div>
-              <b-card-img-lazy v-else :src="resolveImageUrl(c.imageUrl)" top class="complaint-img"></b-card-img-lazy>
-            </template>
-            <div v-else class="no-img-placeholder placeholder-gradient">
-              <h3 class="placeholder-text mb-2">FalaBará</h3>
-              <image-icon size="24" class="text-white-50" />
-            </div>
 
-            <span class="status-badge shadow-sm" :class="getStatusClass(c.statusName)">{{ c.statusName }}</span>
-            <span class="category-badge shadow-sm">{{ c.categoryName }}</span>
+              <span class="status-badge shadow-sm" :class="getStatusClass(c.statusName)">{{ c.statusName }}</span>
+              <span class="category-badge shadow-sm">{{ c.categoryName }}</span>
 
-            <b-button v-if="isOwner(c.authorId)" variant="danger" size="sm" class="btn-delete-post shadow"
-              @click="deleteComplaint(c.id)" v-b-tooltip.hover title="Excluir Post">
-              <trash-2-icon size="14" />
-            </b-button>
-          </div>
-
-          <b-card-body class="d-flex flex-column pt-4">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <small class="text-muted"><calendar-icon size="12" /> {{ formatDate(c.createdAt) }}</small>
-
-              <b-button v-if="userType == 2" size="sm" variant="outline-dark" class="p-2 px-2 font-weight-bold"
-                style="font-size: 0.75rem;" @click="openManageModal(c)">
-                Gerenciar
+              <b-button v-if="isOwner(c.authorId)" variant="danger" size="sm" class="btn-delete-post shadow"
+                @click="deleteComplaint(c.id)" v-b-tooltip.hover title="Excluir Post">
+                <trash-2-icon size="14" />
               </b-button>
             </div>
 
-            <h5 class="card-title font-weight-bold text-dark mb-1">{{ c.title }}</h5>
-            <h6 class="card-subtitle mb-3 text-muted small">
-              <map-pin-icon size="12" class="text-danger" />
-              {{ c.resolvedAddress || c.neighborhood || 'Local não informado' }}
-            </h6>
-            <p class="card-text text-truncate-3 flex-grow-1 text-secondary">{{ c.description }}</p>
+            <b-card-body class="d-flex flex-column pt-4">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <small class="text-muted"><calendar-icon size="12" /> {{ formatDate(c.createdAt) }}</small>
 
-            <div v-if="c.officialResponse" class="mt-3 p-2 bg-light-gray rounded border-left-danger">
-              <div class="d-flex align-items-center mb-1">
-                <span class="badge badge-danger mr-2">Prefeitura</span>
-                <small class="text-muted font-weight-bold">Resposta Oficial</small>
+                <b-button v-if="userType == 2" size="sm" variant="outline-dark" class="py-0 px-2 font-weight-bold"
+                  style="font-size: 0.75rem;" @click="openManageModal(c)">
+                  Gerenciar
+                </b-button>
               </div>
-              <p class="mb-0 small text-dark font-italic">"{{ c.officialResponse }}"</p>
-            </div>
 
-            <hr class="mt-3 mb-3 border-light">
+              <h5 class="card-title font-weight-bold text-dark mb-1">{{ c.title }}</h5>
+              <h6 class="card-subtitle mb-3 text-muted small">
+                <map-pin-icon size="12" class="text-danger" />
+                {{ c.resolvedAddress || c.neighborhood || 'Local não informado' }}
+              </h6>
+              <p class="card-text text-truncate-3 flex-grow-1 text-secondary">{{ c.description }}</p>
 
-            <div class="d-flex justify-content-between align-items-center mt-auto">
-              <small class="text-muted">Por: <strong>{{ c.authorName || 'Anônimo' }}</strong></small>
+              <div v-if="c.officialResponse" class="mt-3 p-2 bg-light-gray rounded border-left-danger text-left">
+                <div class="d-flex align-items-center mb-1">
+                  <span class="badge badge-danger mr-2">Prefeitura</span>
+                  <small class="text-muted font-weight-bold">Resposta Oficial</small>
+                </div>
+                <p class="mb-0 small text-dark font-italic text-left">"{{ c.officialResponse }}"</p>
+              </div>
 
-              <b-button size="sm" :variant="c.isLikedByCurrentUser ? 'danger' : 'outline-danger'"
-                class="btn-vote rounded-pill px-3 p-2" @click="vote(c)" :disabled="voting === c.id">
-                <heart-icon size="14" :class="{ 'fill-current': c.isLikedByCurrentUser }" class="me-2"/>
-                <span class="ml-1">{{ c.likesCount || 0 }}</span>
-              </b-button>
-            </div>
-          </b-card-body>
-        </b-card>
-      </b-col>
-    </b-row>
+              <hr class="mt-3 mb-3 border-light">
+
+              <div class="d-flex justify-content-between align-items-center mt-auto">
+                <small class="text-muted">Por: <strong>{{ c.authorName || 'Anônimo' }}</strong></small>
+
+                <b-button size="sm" :variant="c.isLikedByCurrentUser ? 'danger' : 'outline-danger'"
+                  class="btn-vote rounded-pill px-3" @click="vote(c)" :disabled="voting === c.id">
+                  <heart-icon size="14" :class="{ 'fill-current': c.isLikedByCurrentUser }" />
+                  <span class="ml-1">{{ c.likesCount || 0 }}</span>
+                </b-button>
+              </div>
+            </b-card-body>
+          </b-card>
+        </b-col>
+      </b-row>
+
+      <div class="d-flex justify-content-center mt-4">
+        <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" first-number last-number
+          align="center" class="custom-pagination" @change="handlePageChange"></b-pagination>
+      </div>
+    </div>
 
     <b-modal id="manage-complaint-modal" title="Gerenciar Ocorrência" hide-footer centered hide-header-close>
       <div v-if="selectedComplaint">
@@ -158,9 +164,9 @@
             rows="3" class="input-clean rounded" style="height: auto; padding: 10px;"></b-form-textarea>
         </b-form-group>
 
-        <div class="d-flex justify-content-end mt-4 pt-2 border-top">
-          <b-button variant="danger" class="me-2" @click="$bvModal.hide('manage-complaint-modal')">Cancelar</b-button>
-          <b-button variant="light" class="border-danger" @click="saveManagement" :disabled="manageLoading">
+        <div class="d-flex justify-content-end mt-4 pt-2 border-top gap-2" style="gap: 10px;">
+          <b-button variant="light" @click="$bvModal.hide('manage-complaint-modal')">Cancelar</b-button>
+          <b-button variant="danger" @click="saveManagement" :disabled="manageLoading">
             <b-spinner small v-if="manageLoading" class="mr-1"></b-spinner>
             Salvar Alterações
           </b-button>
@@ -194,6 +200,11 @@ export default {
       filterNeighborhood: '',
       currentUserId: null,
       userType: null,
+
+      // Paginação
+      currentPage: 1,
+      perPage: 9,
+      totalRows: 0,
 
       selectedComplaint: null,
       manageLoading: false,
@@ -231,12 +242,10 @@ export default {
       }
     },
 
-    // CORREÇÃO: Lê 'officialResponse' ao abrir o modal
     openManageModal (complaint) {
       this.selectedComplaint = complaint
       const statusObj = this.statusOptions.find(s => s.text === complaint.statusName)
       this.manageForm.status = statusObj ? statusObj.value : 0
-      // Lê officialResponse (que vem do backend) para preencher o modal
       this.manageForm.officialComment = complaint.officialResponse || ''
       this.$bvModal.show('manage-complaint-modal')
     },
@@ -270,8 +279,38 @@ export default {
     isOwner (userId) { return this.currentUserId && String(userId) === this.currentUserId },
     resolveImageUrl (path) { if (!path) return null; return path.startsWith('http') ? path : `${this.apiBaseUrl}${path}` },
     isVideo (url) { if (!url) return false; return ['mp4', 'mov', 'webm', 'ogg', 'qt'].includes(url.split('.').pop().toLowerCase()) },
-    setActiveTab (tab) { this.activeTab = tab; this.fetchComplaints(true) },
-    onSearchInput () { if (this.searchTimeout) clearTimeout(this.searchTimeout); this.searchTimeout = setTimeout(() => { this.fetchComplaints(true) }, 500) },
+
+    setActiveTab (tab) {
+      this.activeTab = tab
+      this.currentPage = 1
+      this.fetchComplaints(true)
+    },
+
+    onSearchInput () {
+      if (this.searchTimeout) clearTimeout(this.searchTimeout)
+      this.searchTimeout = setTimeout(() => {
+        this.currentPage = 1
+        this.fetchComplaints(true)
+      }, 500)
+    },
+
+    resetPageAndFetch () {
+      this.currentPage = 1
+      this.fetchComplaints(true)
+    },
+
+    clearFilters () {
+      this.filterCategory = null
+      this.filterStatus = null
+      this.filterNeighborhood = ''
+      this.resetPageAndFetch()
+    },
+
+    handlePageChange (page) {
+      this.currentPage = page
+      this.fetchComplaints(true)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    },
 
     async fetchComplaints (showLoader = true) {
       if (showLoader) this.loading = true
@@ -284,7 +323,8 @@ export default {
         const params = {
           search: this.search,
           neighborhood: this.filterNeighborhood,
-          perPage: 12,
+          page: this.currentPage,
+          perPage: this.perPage,
           category: this.filterCategory,
           status: statusFilter,
           orderBy: orderBy,
@@ -299,6 +339,7 @@ export default {
 
         const { data } = await axios.get('/complaints/search', config)
         this.complaints = data.data
+        this.totalRows = data.totalItems
 
         this.complaints.forEach(c => this.resolveAddress(c))
       } catch (error) {
@@ -351,7 +392,6 @@ export default {
         }
       })
     },
-    clearFilters () { this.filterCategory = null; this.filterStatus = null; this.filterNeighborhood = ''; this.fetchComplaints(true) },
 
     getStatusClass (status) {
       switch (status) {
@@ -368,7 +408,6 @@ export default {
 </script>
 
 <style scoped>
-/* (Estilos mantidos) */
 .twitter-tabs {
   overflow-x: auto;
   white-space: nowrap;
@@ -583,5 +622,19 @@ export default {
 
 .border-left-danger {
   border-left: 4px solid #dc3545;
+}
+
+::v-deep .custom-pagination .page-item.active .page-link {
+  background-color: #8B0000 !important;
+  border-color: #8B0000 !important;
+  color: white !important;
+}
+
+::v-deep .custom-pagination .page-link {
+  color: #8B0000 !important;
+}
+
+::v-deep .custom-pagination .page-link:focus {
+  box-shadow: 0 0 0 0.2rem rgba(139, 0, 0, 0.25) !important;
 }
 </style>
