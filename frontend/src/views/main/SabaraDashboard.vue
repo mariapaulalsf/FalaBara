@@ -93,7 +93,7 @@
         </b-col>
       </b-row>
 
-      <b-row>
+      <b-row v-if="userType == 2">
         <b-col cols="12" lg="4" class="mb-4">
           <b-card class="h-100 shadow-sm border-0 rounded-lg">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -136,7 +136,7 @@
         </b-col>
       </b-row>
 
-      <b-row>
+      <b-row v-if="userType == 2">
          <b-col cols="12">
           <b-card class="shadow-sm border-0 rounded-lg mb-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -199,6 +199,16 @@ export default {
   },
   data () {
     return {
+      userName: 'Cidadão',
+      userEmail: '',
+      userCpf: '',
+      userType: '',
+      notifications: [],
+      profileLoading: false,
+      profileForm: {
+        name: '',
+        foneNumber: ''
+      },
       loading: false,
       map: null,
       mapLayerGroup: null,
@@ -274,6 +284,25 @@ export default {
     if (this.map) this.map.remove()
   },
   methods: {
+    loadUserData () {
+        const userDataStr = localStorage.getItem('userData')
+        if (userDataStr) {
+          try {
+            const userData = JSON.parse(userDataStr)
+            if (!userData.id && !userData.Id) {
+              this.logout()
+              return
+            }
+            this.userName = userData.nome || userData.name || 'Cidadão'
+            this.userEmail = userData.email || ''
+            this.userCpf = userData.cpf || ''
+            this.userType = userData.role || ''
+            this.profileForm.name = this.userName
+          } catch (e) {
+            this.logout()
+          }
+        }
+      },
     async fetchAllData () {
       this.loading = true
       try {

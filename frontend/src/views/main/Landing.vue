@@ -41,7 +41,7 @@
               </div>
             </b-nav-item-dropdown>
 
-            <b-nav-item-dropdown no-caret class="user-dropdown" menu-class="shadow-lg border-0 rounded-lg mt-2">
+            <b-nav-item-dropdown no-caret class="user-dropdown" menu-class="shadow-lg border-0 rounded-lg mt-2 me-4">
               <template #button-content>
                 <div class="d-flex align-items-center text-white user-btn">
                   <span class="font-weight-bold mr-2 d-none d-md-inline">{{ userName }}</span>
@@ -51,7 +51,7 @@
                 </div>
               </template>
 
-              <b-dropdown-item @click="openProfileModal" class="py-2">
+              <b-dropdown-item @click="openProfileModal" class="py-2 ">
                 <user-icon size="16" class="mr-2 text-muted" /> Meu Perfil
               </b-dropdown-item>
               <b-dropdown-divider></b-dropdown-divider>
@@ -107,6 +107,20 @@
           <sabara-dashboard />
 
         </b-container>
+        <b-card v-if="userType == 2" no-body class="mb-0">
+            <b-table
+              ref="refUserListTable"
+              class="position-relative"
+              responsive
+              :fields="tableColumns"
+              :items="users"
+              primary-key="id"
+              show-empty
+              :empty-text="emptyText"
+            >
+            </b-table>
+
+        </b-card>
       </b-card>
     </div>
 
@@ -123,7 +137,6 @@
           <user-icon size="42" />
         </div>
         <h5 class="font-weight-bold mb-0 text-dark">{{ userName }}</h5>
-        <span v-if="userType != 1" class="badge badge-light-primary mt-2 px-3 py-1">{{ userType }}</span>
       </div>
 
       <b-form @submit.prevent="updateProfile">
@@ -169,6 +182,7 @@ import SabaraDashboard from './SabaraDashboard.vue'
 import ComplaintFeed from './ComplaintsFeed.vue'
 import { PlusCircleIcon, BellIcon, UserIcon, LogOutIcon, XIcon } from 'vue-feather-icons'
 import { BModal } from 'bootstrap-vue'
+import { watch } from 'vue'
 
 export default {
   name: 'LandingPage',
@@ -185,7 +199,17 @@ export default {
       profileForm: {
         name: '',
         foneNumber: ''
-      }
+      },
+      tableColumns: [
+        { key: "Usuário", sortable: false},
+        { key: "Tipo de Usuário", sortable: false},
+        { key: "Email", sortable: false},
+        { key: "Departamento", sortable: false}
+      ],
+      emptyText: "Nenhum Dado Encontrado",
+      refUserListTable: null,
+      userId: null,
+      users: []
     }
   },
   computed: {
@@ -199,6 +223,9 @@ export default {
     if (this.isLoggedIn) {
       this.loadUserData()
       this.fetchNotifications()
+    }
+    if (this.userType === 2) {
+      this.fetchUsers()
     }
   },
   methods: {
@@ -221,6 +248,10 @@ export default {
         }
       }
     },
+    async fetchUsers () {
+      this.users = userData
+    },
+
     async fetchNotifications () {
       try {
         const token = localStorage.getItem('token')
@@ -315,7 +346,7 @@ export default {
 
 .custom-navbar {
   min-height: 80px;
-  background-color: #1a1a1a !important;
+  background-image: linear-gradient(70deg,#570303,#B11313);
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 .brand-logo {
@@ -434,6 +465,10 @@ export default {
 .text-sabara { color: white;
 background-color: #8B0000;
 border: #8B0000;}
+.text-sabara:hover {
+  background-color: white;
+  color: #8B0000;
+}
 .btn-cta {
   border-radius: 0.25rem !important;
 }
