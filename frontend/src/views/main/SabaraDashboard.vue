@@ -5,15 +5,26 @@
         <bar-chart-2-icon size="24" class="mr-2 text-sabara" />
         Painel da Cidade
       </h4>
-      <b-button size="sm" variant="outline-secondary" class="shadow-sm btn-semi-rounded" @click="fetchAllData">
-        <refresh-cw-icon size="16" class="mr-1" :class="{ 'spin-icon': loading }" />
+      <b-button
+        size="sm"
+        variant="outline-secondary"
+        class="shadow-sm btn-semi-rounded"
+        @click="fetchAllData"
+      >
+        <refresh-cw-icon
+          size="16"
+          class="mr-1"
+          :class="{ 'spin-icon': loading }"
+        />
         Atualizar
       </b-button>
     </div>
 
     <div v-if="loading" class="text-center py-5">
       <b-spinner variant="danger" />
-      <p class="text-muted mt-2 small font-weight-bold">Sincronizando dados...</p>
+      <p class="text-muted mt-2 small font-weight-bold">
+        Sincronizando dados...
+      </p>
     </div>
 
     <div v-else>
@@ -22,8 +33,14 @@
           <div class="kpi-card kpi-total h-100 shadow-sm">
             <div class="d-flex justify-content-between align-items-start">
               <div>
-                <p class="text-muted mb-1 font-weight-bold small text-uppercase">Total de Ocorrências</p>
-                <h2 class="font-weight-bolder mb-0 text-dark">{{ metrics.totalComplaints }}</h2>
+                <p
+                  class="text-muted mb-1 font-weight-bold small text-uppercase"
+                >
+                  Total de Ocorrências
+                </p>
+                <h2 class="font-weight-bolder mb-0 text-dark">
+                  {{ metrics.totalComplaints }}
+                </h2>
               </div>
               <div class="icon-bg bg-light-danger">
                 <activity-icon size="20" class="text-sabara" />
@@ -36,8 +53,14 @@
           <div class="kpi-card kpi-analysis h-100 shadow-sm">
             <div class="d-flex justify-content-between align-items-start">
               <div>
-                <p class="text-muted mb-1 font-weight-bold small text-uppercase">Em Análise</p>
-                <h2 class="font-weight-bolder mb-0 text-warning">{{ metrics.totalInAnalysis }}</h2>
+                <p
+                  class="text-muted mb-1 font-weight-bold small text-uppercase"
+                >
+                  Em Análise
+                </p>
+                <h2 class="font-weight-bolder mb-0 text-warning">
+                  {{ metrics.totalInAnalysis }}
+                </h2>
               </div>
               <div class="icon-bg bg-light-warning">
                 <clock-icon size="20" class="text-warning" />
@@ -50,8 +73,14 @@
           <div class="kpi-card kpi-resolved h-100 shadow-sm">
             <div class="d-flex justify-content-between align-items-start">
               <div>
-                <p class="text-muted mb-1 font-weight-bold small text-uppercase">Resolvido</p>
-                <h2 class="font-weight-bolder mb-0 text-success">{{ metrics.totalResolved }}</h2>
+                <p
+                  class="text-muted mb-1 font-weight-bold small text-uppercase"
+                >
+                  Resolvido
+                </p>
+                <h2 class="font-weight-bolder mb-0 text-success">
+                  {{ metrics.totalResolved }}
+                </h2>
               </div>
               <div class="icon-bg bg-light-success">
                 <check-circle-icon size="20" class="text-success" />
@@ -64,22 +93,30 @@
       <b-row class="mb-4">
         <b-col cols="12">
           <b-card no-body class="border-0 shadow-sm rounded-lg overflow-hidden">
-            <div class="p-3 border-bottom bg-white d-flex justify-content-between align-items-center flex-wrap">
+            <div
+              class="p-3 border-bottom bg-white d-flex justify-content-between align-items-center flex-wrap"
+            >
               <div>
                 <h5 class="mb-0 font-weight-bold">Geolocalização</h5>
-                <small class="text-muted">Distribuição das ocorrências na cidade</small>
+                <small class="text-muted"
+                  >Distribuição das ocorrências na cidade</small
+                >
               </div>
 
               <div class="map-controls mt-2 mt-md-0">
                 <b-button-group size="sm">
                   <b-button
-                    :variant="mapMode === 'heat' ? 'danger' : 'outline-secondary'"
+                    :variant="
+                      mapMode === 'heat' ? 'danger' : 'outline-secondary'
+                    "
                     @click="setMapMode('heat')"
                   >
                     Mapa de Calor
                   </b-button>
                   <b-button
-                    :variant="mapMode === 'marker' ? 'danger' : 'outline-secondary'"
+                    :variant="
+                      mapMode === 'marker' ? 'danger' : 'outline-secondary'
+                    "
                     @click="setMapMode('marker')"
                   >
                     Pontos
@@ -88,7 +125,10 @@
               </div>
             </div>
 
-            <div id="heatmap-container" style="height: 450px; width: 100%;"></div>
+            <div
+              id="heatmap-container"
+              style="height: 450px; width: 100%"
+            ></div>
           </b-card>
         </b-col>
       </b-row>
@@ -97,9 +137,18 @@
         <b-row>
           <b-col cols="12" lg="4" class="mb-4">
             <b-card class="h-100 shadow-sm border-0 rounded-lg">
-              <div class="d-flex justify-content-between align-items-center mb-3">
+              <div
+                class="d-flex justify-content-between align-items-center mb-3"
+              >
                 <h6 class="font-weight-bold mb-0">Status Geral</h6>
-                <b-button size="sm" variant="light" class="text-muted" @click="downloadChart('donutChart')" v-b-tooltip.hover title="Baixar PNG">
+                <b-button
+                  size="sm"
+                  variant="light"
+                  class="text-muted"
+                  @click="downloadChart('donutChart')"
+                  v-b-tooltip.hover
+                  title="Baixar PNG"
+                >
                   <download-icon size="16" />
                 </b-button>
               </div>
@@ -116,12 +165,23 @@
 
           <b-col cols="12" lg="8" class="mb-4">
             <b-card class="h-100 shadow-sm border-0 rounded-lg">
-              <div class="d-flex justify-content-between align-items-center mb-3">
+              <div
+                class="d-flex justify-content-between align-items-center mb-3"
+              >
                 <div>
                   <h6 class="font-weight-bold mb-0">Evolução Diária</h6>
-                  <small class="text-muted">Novas reclamações nos últimos 7 dias</small>
+                  <small class="text-muted"
+                    >Novas reclamações nos últimos 7 dias</small
+                  >
                 </div>
-                <b-button size="sm" variant="light" class="text-muted" @click="downloadChart('evolutionChart')" v-b-tooltip.hover title="Baixar PNG">
+                <b-button
+                  size="sm"
+                  variant="light"
+                  class="text-muted"
+                  @click="downloadChart('evolutionChart')"
+                  v-b-tooltip.hover
+                  title="Baixar PNG"
+                >
                   <download-icon size="16" />
                 </b-button>
               </div>
@@ -138,11 +198,20 @@
         </b-row>
 
         <b-row>
-           <b-col cols="12">
+          <b-col cols="12">
             <b-card class="shadow-sm border-0 rounded-lg mb-4">
-              <div class="d-flex justify-content-between align-items-center mb-3">
+              <div
+                class="d-flex justify-content-between align-items-center mb-3"
+              >
                 <h6 class="font-weight-bold mb-0">Ocorrências por Categoria</h6>
-                <b-button size="sm" variant="light" class="text-muted" @click="downloadChart('categoryChart')" v-b-tooltip.hover title="Baixar PNG">
+                <b-button
+                  size="sm"
+                  variant="light"
+                  class="text-muted"
+                  @click="downloadChart('categoryChart')"
+                  v-b-tooltip.hover
+                  title="Baixar PNG"
+                >
                   <download-icon size="16" />
                 </b-button>
               </div>
@@ -158,23 +227,52 @@
           </b-col>
         </b-row>
       </div>
-
-      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import axios from '@/libs/axios'
-import { BRow, BCol, BCard, BButton, BButtonGroup, BSpinner } from 'bootstrap-vue'
+import {
+  BRow,
+  BCol,
+  BCard,
+  BButton,
+  BButtonGroup,
+  BSpinner
+} from 'bootstrap-vue'
 import ApexChart from 'vue-apexcharts'
-import { BarChart2Icon, RefreshCwIcon, ActivityIcon, CheckCircleIcon, ClockIcon, DownloadIcon } from 'vue-feather-icons'
+import {
+  BarChart2Icon,
+  RefreshCwIcon,
+  ActivityIcon,
+  CheckCircleIcon,
+  ClockIcon,
+  DownloadIcon
+} from 'vue-feather-icons'
 
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet.heat'
 
-const STATUS_MAP = { 0: 'Aberto', 1: 'Em Análise', 2: 'Em Andamento', 3: 'Resolvido', 4: 'Cancelado' }
-const CATEGORY_MAP = { 0: 'Saúde', 1: 'Infraestrutura', 2: 'Trânsito', 3: 'Iluminação', 4: 'Limpeza', 5: 'Segurança', 6: 'Educação', 7: 'Meio Ambiente', 8: 'Outros' }
+const STATUS_MAP = {
+  0: 'Aberto',
+  1: 'Em Análise',
+  2: 'Em Andamento',
+  3: 'Resolvido',
+  4: 'Cancelado'
+}
+const CATEGORY_MAP = {
+  0: 'Saúde',
+  1: 'Infraestrutura',
+  2: 'Trânsito',
+  3: 'Iluminação',
+  4: 'Limpeza',
+  5: 'Segurança',
+  6: 'Educação',
+  7: 'Meio Ambiente',
+  8: 'Outros'
+}
 
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
@@ -222,12 +320,12 @@ export default {
   },
   computed: {
     chartStatusSeries () {
-      return this.metrics.complaintsByStatus.map(i => i.value)
+      return this.metrics.complaintsByStatus.map((i) => i.value)
     },
     chartStatusOptions () {
       return {
         chart: { id: 'status-donut', toolbar: { show: true } },
-        labels: this.metrics.complaintsByStatus.map(i => STATUS_MAP[i.label]),
+        labels: this.metrics.complaintsByStatus.map((i) => STATUS_MAP[i.label]),
         colors: ['#ea5455', '#ff9f43', '#00cfe8', '#28c76f', '#82868b'],
         dataLabels: { enabled: false },
         legend: { position: 'bottom' },
@@ -236,24 +334,42 @@ export default {
     },
 
     chartCategorySeries () {
-      return [{ name: 'Ocorrências', data: this.metrics.complaintsByCategory.map(i => i.value) }]
+      return [
+        {
+          name: 'Ocorrências',
+          data: this.metrics.complaintsByCategory.map((i) => i.value)
+        }
+      ]
     },
     chartCategoryOptions () {
       return {
         chart: { id: 'category-bar', toolbar: { show: true } },
-        plotOptions: { bar: { horizontal: true, borderRadius: 4, barHeight: '50%' } },
-        xaxis: { categories: this.metrics.complaintsByCategory.map(i => CATEGORY_MAP[i.label]) },
+        plotOptions: {
+          bar: { horizontal: true, borderRadius: 4, barHeight: '50%' }
+        },
+        xaxis: {
+          categories: this.metrics.complaintsByCategory.map(
+            (i) => CATEGORY_MAP[i.label]
+          )
+        },
         colors: ['#8B0000'],
         grid: { borderColor: '#f1f1f1' }
       }
     },
 
     chartEvolutionSeries () {
-      return [{ name: 'Novas Reclamações', data: this.dailyEvolutionData.data }]
+      return [
+        { name: 'Novas Reclamações', data: this.dailyEvolutionData.data }
+      ]
     },
     chartEvolutionOptions () {
       return {
-        chart: { id: 'evolution-area', type: 'area', toolbar: { show: true }, zoom: { enabled: false } },
+        chart: {
+          id: 'evolution-area',
+          type: 'area',
+          toolbar: { show: true },
+          zoom: { enabled: false }
+        },
         dataLabels: { enabled: false },
         stroke: { curve: 'smooth', width: 2 },
         xaxis: {
@@ -266,7 +382,12 @@ export default {
         colors: ['#8B0000'],
         fill: {
           type: 'gradient',
-          gradient: { shadeIntensity: 1, opacityFrom: 0.7, opacityTo: 0.2, stops: [0, 90, 100] }
+          gradient: {
+            shadeIntensity: 1,
+            opacityFrom: 0.7,
+            opacityTo: 0.2,
+            stops: [0, 90, 100]
+          }
         }
       }
     }
@@ -329,7 +450,7 @@ export default {
         labels.push(label)
       }
 
-      complaints.forEach(c => {
+      complaints.forEach((c) => {
         if (c.createdAt) {
           const key = c.createdAt.split('T')[0]
           if (Object.prototype.hasOwnProperty.call(dateCount, key)) {
@@ -365,15 +486,23 @@ export default {
         this.mapLayerGroup.clearLayers()
       }
 
-      const validPoints = this.tempPoints.filter(c => c.latitude && c.longitude)
+      const validPoints = this.tempPoints.filter(
+        (c) => c.latitude && c.longitude
+      )
 
       if (this.mapMode === 'heat') {
-        const heatPoints = validPoints.map(c => [c.latitude, c.longitude, 0.6])
+        const heatPoints = validPoints.map((c) => [
+          c.latitude,
+          c.longitude,
+          0.6
+        ])
         if (heatPoints.length) {
-          L.heatLayer(heatPoints, { radius: 25, blur: 15, maxZoom: 17 }).addTo(this.mapLayerGroup)
+          L.heatLayer(heatPoints, { radius: 25, blur: 15, maxZoom: 17 }).addTo(
+            this.mapLayerGroup
+          )
         }
       } else {
-        validPoints.forEach(c => {
+        validPoints.forEach((c) => {
           const color = '#8B0000'
           L.circleMarker([c.latitude, c.longitude], {
             radius: 8,
@@ -383,7 +512,11 @@ export default {
             opacity: 1,
             fillOpacity: 0.8
           })
-            .bindPopup(`<strong>${c.title}</strong><br/>${c.neighborhood || 'Bairro não inf.'}`)
+            .bindPopup(
+              `<strong>${c.title}</strong><br/>${
+                c.neighborhood || 'Bairro não inf.'
+              }`
+            )
             .addTo(this.mapLayerGroup)
         })
       }
@@ -407,12 +540,12 @@ export default {
   background: #fff;
   padding: 1.5rem;
   border-radius: 16px;
-  border: 1px solid rgba(0,0,0,0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   transition: transform 0.2s;
 }
 .kpi-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.05) !important;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05) !important;
 }
 
 .icon-bg {
@@ -423,17 +556,27 @@ export default {
   align-items: center;
   justify-content: center;
 }
-.bg-light-danger { background-color: #fff0f0; }
-.bg-light-warning { background-color: #fff8ec; }
-.bg-light-success { background-color: #eafbe7; }
+.bg-light-danger {
+  background-color: #fff0f0;
+}
+.bg-light-warning {
+  background-color: #fff8ec;
+}
+.bg-light-success {
+  background-color: #eafbe7;
+}
 
-.btn-semi-rounded { border-radius: 8px; }
+.btn-semi-rounded {
+  border-radius: 8px;
+}
 
 .spin-icon {
   animation: spin 1s linear infinite;
 }
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .map-controls button {
@@ -441,5 +584,7 @@ export default {
   font-size: 0.85rem;
 }
 
-.text-sabara { color: #8b0000; }
+.text-sabara {
+  color: #8b0000;
+}
 </style>
