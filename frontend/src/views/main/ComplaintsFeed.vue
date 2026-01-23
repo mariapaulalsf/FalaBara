@@ -106,7 +106,7 @@
             <div class="d-flex justify-content-between align-items-center mb-2">
               <small class="text-muted"><calendar-icon size="12" /> {{ formatDate(c.createdAt) }}</small>
 
-              <b-button v-if="userType == 2" size="sm" variant="outline-dark" class="py-0 px-2 font-weight-bold"
+              <b-button v-if="userType == 2" size="sm" variant="outline-dark" class="p-2 px-2 font-weight-bold"
                 style="font-size: 0.75rem;" @click="openManageModal(c)">
                 Gerenciar
               </b-button>
@@ -133,8 +133,8 @@
               <small class="text-muted">Por: <strong>{{ c.authorName || 'Anônimo' }}</strong></small>
 
               <b-button size="sm" :variant="c.isLikedByCurrentUser ? 'danger' : 'outline-danger'"
-                class="btn-vote rounded-pill px-3" @click="vote(c)" :disabled="voting === c.id">
-                <heart-icon size="14" :class="{ 'fill-current': c.isLikedByCurrentUser }" />
+                class="btn-vote rounded-pill px-3 p-2" @click="vote(c)" :disabled="voting === c.id">
+                <heart-icon size="14" :class="{ 'fill-current': c.isLikedByCurrentUser }" class="me-2"/>
                 <span class="ml-1">{{ c.likesCount || 0 }}</span>
               </b-button>
             </div>
@@ -143,7 +143,7 @@
       </b-col>
     </b-row>
 
-    <b-modal id="manage-complaint-modal" title="Gerenciar Ocorrência" hide-footer centered>
+    <b-modal id="manage-complaint-modal" title="Gerenciar Ocorrência" hide-footer centered hide-header-close>
       <div v-if="selectedComplaint">
         <h6 class="font-weight-bold mb-3">{{ selectedComplaint.title }}</h6>
 
@@ -159,8 +159,8 @@
         </b-form-group>
 
         <div class="d-flex justify-content-end mt-4 pt-2 border-top">
-          <b-button variant="light" class="mr-2" @click="$bvModal.hide('manage-complaint-modal')">Cancelar</b-button>
-          <b-button variant="danger" @click="saveManagement" :disabled="manageLoading">
+          <b-button variant="danger" class="me-2" @click="$bvModal.hide('manage-complaint-modal')">Cancelar</b-button>
+          <b-button variant="light" class="border-danger" @click="saveManagement" :disabled="manageLoading">
             <b-spinner small v-if="manageLoading" class="mr-1"></b-spinner>
             Salvar Alterações
           </b-button>

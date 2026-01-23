@@ -1,15 +1,16 @@
 <template>
   <div class="landing-page modern-ui">
     <b-navbar toggleable="lg" type="dark" variant="dark" class="px-4 py-3 custom-navbar glass-navbar">
+      <img src="../../../public/megafone (1).png" alt="Megaphone" class="me-2">
       <b-navbar-brand href="#" class="font-weight-bold brand-logo">FalaBará</b-navbar-brand>
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav class="ml-auto d-flex align-items-center justify-content-end w-100">
           <div v-if="isLoggedIn" class="d-flex align-items-center">
-            <b-nav-item-dropdown no-caret right menu-class="notification-menu shadow-lg border-0 rounded-lg"
-              class="notification-dropdown mr-3" @show="markNotificationsAsRead">
+            <b-nav-item-dropdown no-caret right menu-class=" shadow-lg border-0 rounded-lg"
+              class="notification-dropdown me-3" @show="markNotificationsAsRead">
               <template #button-content>
-                <div class="icon-wrapper position-relative d-flex align-items-center justify-content-center">
+                <div class="icon-wrapper  d-flex align-items-center justify-content-center">
                   <bell-icon size="20" class="text-white" />
                   <span v-if="unreadCount > 0" class="notification-badge">{{ unreadCount }}</span>
                 </div>
@@ -18,7 +19,7 @@
                 class="d-flex justify-content-between align-items-center px-3 py-3 border-bottom bg-white rounded-top">
                 <span class="font-weight-bold text-dark h6 mb-0">Notificações</span>
               </b-dropdown-header>
-              <div class="notification-list-container custom-scrollbar">
+              <div class="notification-list-container custom-scrollbar ms-n1">
                 <div v-if="notifications.length === 0" class="text-center p-4 text-muted">
                   <small>Nenhuma notificação recente.</small>
                 </div>
@@ -39,7 +40,7 @@
             <b-nav-item-dropdown no-caret class="user-dropdown" menu-class="shadow-lg border-0 rounded-lg mt-2 me-4">
               <template #button-content>
                 <div class="d-flex align-items-center text-white user-btn">
-                  <span class="font-weight-bold mr-2 d-none d-md-inline">{{ userName }}</span>
+                  <span class="font-weight-bold me-2 d-none d-md-inline">{{ userName }}</span>
                   <div class="user-avatar shadow-sm">
                     <user-icon size="18" />
                   </div>
@@ -55,7 +56,7 @@
           </div>
           <div v-else class="d-flex align-items-center ml-auto auth-buttons">
             <b-button variant="outline-light" :to="{ name: 'auth-login' }"
-              class="px-4 btn-semi-rounded font-weight-bold mr-3">Entrar</b-button>
+              class="px-4 btn-semi-rounded font-weight-bold me-3">Entrar</b-button>
             <b-button variant="light" :to="{ name: 'auth-register' }"
               class="px-4 btn-semi-rounded font-weight-bold text-sabara">Cadastrar</b-button>
           </div>
@@ -67,7 +68,7 @@
       <b-container class="content-overlay">
         <h1 class="display-4 font-weight-bold">Transforme Sabará com sua voz</h1>
         <p class="lead mb-4">Relate problemas, acompanhe soluções e ajude a prefeitura a priorizar.</p>
-        <b-button size="lg" variant="light" class="text-sabara font-weight-bold shadow p-3" @click="goToNewComplaint">
+        <b-button size="lg" class="text-sabara font-weight-bold shadow p-3" @click="goToNewComplaint">
           <plus-circle-icon /> REGISTRAR RECLAMAÇÃO
         </b-button>
       </b-container>
@@ -225,7 +226,7 @@
                 :options="roleOptions" class="input-modern form-control"></b-form-select></b-form-group></b-col>
         </b-row>
         <b-row class="mt-3" v-if="createUserForm.role === 2"><b-col md="12"><b-form-group label="Departamento"
-              class="font-weight-bold text-muted small text-uppercase text-sabara"><b-form-select
+              class="font-weight-bold text-muted small text-uppercase text-sabaras"><b-form-select
                 v-model="createUserForm.department" :options="departmentOptions" class="input-modern form-control"
                 required></b-form-select></b-form-group></b-col></b-row>
         <div class="d-flex justify-content-end align-items-center mt-4 pt-3 border-top modal-footer-actions">
@@ -504,7 +505,9 @@ export default {
 }
 
 .text-sabara {
-  color: #8B0000;
+  color: white;
+  background-color: #8B0000;
+  border: #8B0000;
 }
 
 .bg-sabara {
@@ -626,5 +629,9 @@ export default {
 
 .btn-semi-rounded {
   border-radius: 8px !important;
+}
+.text-sabara:hover {
+  background-color: white;
+  color: #8B0000;
 }
 </style>
