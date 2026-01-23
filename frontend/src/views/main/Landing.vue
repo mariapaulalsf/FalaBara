@@ -1,11 +1,11 @@
 <template>
   <div class="landing-page modern-ui">
-    <b-navbar toggleable="lg" type="dark" variant="dark" class="px-4 py-3 custom-navbar glass-navbar">
-      <img src="../../../public/megafone (1).png" alt="Megaphone" class="me-2">
+    <b-navbar toggleable="lg" type="dark" variant="dark" class="p-3 custom-navbar glass-navbar">
+      <img src="../../../public/megafone (1).png" alt="Megaphone" class="me-2 ps-3">
       <b-navbar-brand href="#" class="font-weight-bold brand-logo">FalaBará</b-navbar-brand>
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
       <b-collapse id="nav-collapse" is-nav>
-        <b-navbar-nav class="ml-auto d-flex align-items-center justify-content-end w-100">
+        <b-navbar-nav class="ml-auto d-flex justify-content-end w-100">
           <div v-if="isLoggedIn" class="d-flex align-items-center">
             <b-nav-item-dropdown no-caret right menu-class=" shadow-lg border-0 rounded-lg"
               class="notification-dropdown me-3" @show="markNotificationsAsRead">
