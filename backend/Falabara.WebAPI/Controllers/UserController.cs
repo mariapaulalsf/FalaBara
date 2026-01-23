@@ -42,14 +42,32 @@ namespace Falabara.WebAPI.Controllers
         [HttpGet("search")]
         public async Task<IActionResult> Search(
             [FromQuery] string? search,
+            [FromQuery] int? type,
             [FromQuery] int page = 1,
-            [FromQuery] int perPage = 10)
+            [FromQuery] int perPage = 100)
         {
             try
             {
-                var query = new SearchUsersQuery(search, page, perPage);
+                var query = new SearchUsersQuery(search, type, page, perPage);
                 var result = await _mediator.Send(query);
                 return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateUserCommand command)
+        {
+            try 
+            {
+                var success = await _mediator.Send(command);
+                
+                if (success)
+                    return Ok(new { message = "Usuário criado com sucesso!" });
+                else
+                    return BadRequest(new { message = "Erro ao criar usuário." });
             }
             catch (Exception ex)
             {

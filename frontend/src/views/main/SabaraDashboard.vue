@@ -93,70 +93,73 @@
         </b-col>
       </b-row>
 
-      <b-row v-if="userType == 2">
-        <b-col cols="12" lg="4" class="mb-4">
-          <b-card class="h-100 shadow-sm border-0 rounded-lg">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <h6 class="font-weight-bold mb-0">Status Geral</h6>
-              <b-button size="sm" variant="light" class="text-muted" @click="downloadChart('donutChart')" v-b-tooltip.hover title="Baixar PNG">
-                <download-icon size="16" />
-              </b-button>
-            </div>
-
-            <ApexChart
-              ref="donutChart"
-              type="donut"
-              height="300"
-              :options="chartStatusOptions"
-              :series="chartStatusSeries"
-            />
-          </b-card>
-        </b-col>
-
-        <b-col cols="12" lg="8" class="mb-4">
-          <b-card class="h-100 shadow-sm border-0 rounded-lg">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <div>
-                <h6 class="font-weight-bold mb-0">Evolução Diária</h6>
-                <small class="text-muted">Novas reclamações nos últimos 7 dias</small>
+      <div v-if="userType == 2">
+        <b-row>
+          <b-col cols="12" lg="4" class="mb-4">
+            <b-card class="h-100 shadow-sm border-0 rounded-lg">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="font-weight-bold mb-0">Status Geral</h6>
+                <b-button size="sm" variant="light" class="text-muted" @click="downloadChart('donutChart')" v-b-tooltip.hover title="Baixar PNG">
+                  <download-icon size="16" />
+                </b-button>
               </div>
-              <b-button size="sm" variant="light" class="text-muted" @click="downloadChart('evolutionChart')" v-b-tooltip.hover title="Baixar PNG">
-                <download-icon size="16" />
-              </b-button>
-            </div>
 
-            <ApexChart
-              ref="evolutionChart"
-              type="area"
-              height="300"
-              :options="chartEvolutionOptions"
-              :series="chartEvolutionSeries"
-            />
-          </b-card>
-        </b-col>
-      </b-row>
+              <ApexChart
+                ref="donutChart"
+                type="donut"
+                height="300"
+                :options="chartStatusOptions"
+                :series="chartStatusSeries"
+              />
+            </b-card>
+          </b-col>
 
-      <b-row v-if="userType == 2">
-         <b-col cols="12">
-          <b-card class="shadow-sm border-0 rounded-lg mb-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <h6 class="font-weight-bold mb-0">Ocorrências por Categoria</h6>
-              <b-button size="sm" variant="light" class="text-muted" @click="downloadChart('categoryChart')" v-b-tooltip.hover title="Baixar PNG">
-                <download-icon size="16" />
-              </b-button>
-            </div>
+          <b-col cols="12" lg="8" class="mb-4">
+            <b-card class="h-100 shadow-sm border-0 rounded-lg">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <h6 class="font-weight-bold mb-0">Evolução Diária</h6>
+                  <small class="text-muted">Novas reclamações nos últimos 7 dias</small>
+                </div>
+                <b-button size="sm" variant="light" class="text-muted" @click="downloadChart('evolutionChart')" v-b-tooltip.hover title="Baixar PNG">
+                  <download-icon size="16" />
+                </b-button>
+              </div>
 
-            <ApexChart
-              ref="categoryChart"
-              type="bar"
-              height="350"
-              :options="chartCategoryOptions"
-              :series="chartCategorySeries"
-            />
-          </b-card>
-        </b-col>
-      </b-row>
-    </div>
+              <ApexChart
+                ref="evolutionChart"
+                type="area"
+                height="300"
+                :options="chartEvolutionOptions"
+                :series="chartEvolutionSeries"
+              />
+            </b-card>
+          </b-col>
+        </b-row>
+
+        <b-row>
+           <b-col cols="12">
+            <b-card class="shadow-sm border-0 rounded-lg mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="font-weight-bold mb-0">Ocorrências por Categoria</h6>
+                <b-button size="sm" variant="light" class="text-muted" @click="downloadChart('categoryChart')" v-b-tooltip.hover title="Baixar PNG">
+                  <download-icon size="16" />
+                </b-button>
+              </div>
+
+              <ApexChart
+                ref="categoryChart"
+                type="bar"
+                height="350"
+                :options="chartCategoryOptions"
+                :series="chartCategorySeries"
+              />
+            </b-card>
+          </b-col>
+        </b-row>
+      </div>
+
+      </div>
   </div>
 </template>
 
@@ -199,16 +202,7 @@ export default {
   },
   data () {
     return {
-      userName: 'Cidadão',
-      userEmail: '',
-      userCpf: '',
-      userType: '',
-      notifications: [],
-      profileLoading: false,
-      profileForm: {
-        name: '',
-        foneNumber: ''
-      },
+      userType: null, // Variável para controlar a visibilidade
       loading: false,
       map: null,
       mapLayerGroup: null,
@@ -246,7 +240,7 @@ export default {
     },
     chartCategoryOptions () {
       return {
-        chart: { id: 'category-bar', toolbar: { show: true } }, // Toolbar habilitada para export funcionar
+        chart: { id: 'category-bar', toolbar: { show: true } },
         plotOptions: { bar: { horizontal: true, borderRadius: 4, barHeight: '50%' } },
         xaxis: { categories: this.metrics.complaintsByCategory.map(i => CATEGORY_MAP[i.label]) },
         colors: ['#8B0000'],
@@ -277,6 +271,10 @@ export default {
       }
     }
   },
+  created () {
+    // Carregar o tipo de usuário ao criar o componente
+    this.checkUserRole()
+  },
   mounted () {
     this.fetchAllData()
   },
@@ -284,25 +282,20 @@ export default {
     if (this.map) this.map.remove()
   },
   methods: {
-    loadUserData () {
-        const userDataStr = localStorage.getItem('userData')
-        if (userDataStr) {
-          try {
-            const userData = JSON.parse(userDataStr)
-            if (!userData.id && !userData.Id) {
-              this.logout()
-              return
-            }
-            this.userName = userData.nome || userData.name || 'Cidadão'
-            this.userEmail = userData.email || ''
-            this.userCpf = userData.cpf || ''
-            this.userType = userData.role || ''
-            this.profileForm.name = this.userName
-          } catch (e) {
-            this.logout()
-          }
+    checkUserRole () {
+      const userDataStr = localStorage.getItem('userData')
+      if (userDataStr) {
+        try {
+          const userData = JSON.parse(userDataStr)
+          // Assume que o role 2 é Prefeitura/CityHall
+          this.userType = userData.role || userData.userType || userData.type
+        } catch (e) {
+          this.userType = null
         }
-      },
+      } else {
+        this.userType = null
+      }
+    },
     async fetchAllData () {
       this.loading = true
       try {

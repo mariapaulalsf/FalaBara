@@ -22,40 +22,39 @@ namespace Falabara.Application.Queries.User
             int offset = (request.Page - 1) * request.PerPage;
 
             string sql = @"
-                SELECT 
-                    id, 
-                    name, 
-                    email, 
-                    cpf, 
-                    user_type,   -- Nome real no banco
-                    department, 
-                    fone_number, -- Nome real no banco
-                    active,
-                    COUNT(*) OVER() as TotalItems
-                FROM ""Users""
-                WHERE 
-                    (@Search IS NULL OR (
-                        name ILIKE '%' || @Search || '%' OR
-                        email ILIKE '%' || @Search || '%' OR
-                        cpf ILIKE '%' || @Search || '%'
-                    ))
-                ORDER BY name ASC
-                LIMIT @PerPage OFFSET @Offset";
+        SELECT 
+            id, name, email, cpf, user_type, department, fone_number, active,
+            COUNT(*) OVER() as TotalItems
+        FROM ""Users""
+        WHERE 
+            (@Type IS NULL OR user_type = @Type) AND -- NOVO FILTRO
+            (@Search IS NULL OR (
+                name ILIKE '%' || @Search || '%' OR
+                email ILIKE '%' || @Search || '%' OR
+                cpf ILIKE '%' || @Search || '%'
+            ))
+        ORDER BY name ASC
+        LIMIT @PerPage OFFSET @Offset";
 
             var result = await _dbConnection.QueryAsync<dynamic>(
-                sql, 
-                new { Search = request.Search, PerPage = request.PerPage, Offset = offset }
+                sql,
+                new
+                {
+                    Search = request.Search,
+                    Type = request.Type, 
+                    PerPage = request.PerPage,
+                    Offset = offset
+                }
             );
-
             var list = result.Select(x => new UserDto
             {
                 Id = x.id,
                 Name = x.name,
                 Email = x.email,
                 Cpf = x.cpf,
-                Type = (UserType)x.user_type, 
+                Type = (UserType)x.user_type,
                 Department = x.department,
-                FoneNumber = x.fone_number, 
+                FoneNumber = x.fone_number,
                 Active = x.active
             }).ToList();
 
