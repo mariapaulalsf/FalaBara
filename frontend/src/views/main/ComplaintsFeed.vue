@@ -134,7 +134,7 @@
 
                 <b-button size="sm" :variant="c.isLikedByCurrentUser ? 'danger' : 'outline-danger'"
                   class="btn-vote rounded-pill px-3" @click="vote(c)" :disabled="voting === c.id">
-                  <heart-icon size="14" :class="{ 'fill-current': c.isLikedByCurrentUser }" />
+                  <heart-icon size="14" :class="{ 'fill-current': c.isLikedByCurrentUser }" class="me-1"/>
                   <span class="ml-1">{{ c.likesCount || 0 }}</span>
                 </b-button>
               </div>
@@ -215,9 +215,9 @@ export default {
 
       sabaraNeighborhoods: [
         'Centro', 'Nações Unidas', 'Siderúrgica', 'Alvorada', 'General Carneiro',
-        'Ana Lúcia', 'Santa Inês', 'Rosário', 'Fátima', 'Cabral',
-        'Vila Real', 'Nova Vista', 'Santo Antônio', 'Roça Grande',
-        'Itacolomi', 'Morada da Serra', 'Vila Rica', 'Pompéu', 'Ravenna'
+        'Ana Lúcia', 'Santa Inês', 'Rosário', 'Esplanada', 'Fátima', 'Cabral',
+        'Vila Real', 'Nova Vista', 'Santo Antônio', 'Rosário II', 'Roça Grande',
+        'Itacolomi', 'Morada da Serra', 'Vila Francisco de Moura', 'Vila Rica', 'Pompéu', 'Ravenna'
       ].sort(),
 
       categoryOptions: [{ value: 0, text: 'Saúde' }, { value: 1, text: 'Infraestrutura' }, { value: 2, text: 'Trânsito' }, { value: 3, text: 'Iluminação' }, { value: 4, text: 'Limpeza' }, { value: 5, text: 'Segurança' }, { value: 6, text: 'Educação' }, { value: 7, text: 'Meio Ambiente' }, { value: 8, text: 'Outros' }],

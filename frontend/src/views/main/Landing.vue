@@ -1,13 +1,14 @@
 <template>
   <div class="landing-page modern-ui">
-    <b-navbar toggleable="lg" type="dark" variant="dark" class="px-4 py-3 custom-navbar glass-navbar">
+    <b-navbar toggleable="lg" type="dark" variant="dark" class="p-3 custom-navbar glass-navbar">
+      <img src="../../../public/megafone (1).png" alt="Megaphone" class="me-2 ps-3">
       <b-navbar-brand href="#" class="font-weight-bold brand-logo">FalaBará</b-navbar-brand>
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
       <b-collapse id="nav-collapse" is-nav>
-        <b-navbar-nav class="ml-auto d-flex align-items-center justify-content-end w-100">
+        <b-navbar-nav class="ml-auto d-flex justify-content-end w-100">
           <div v-if="isLoggedIn" class="d-flex align-items-center gap-3">
             <b-nav-item-dropdown no-caret right menu-class="notification-menu shadow-lg border-0 rounded-lg"
-              class="notification-dropdown mr-3" @show="markNotificationsAsRead">
+              class="notification-dropdown me-1" @show="markNotificationsAsRead">
               <template #button-content>
                 <div class="icon-wrapper position-relative d-flex align-items-center justify-content-center">
                   <bell-icon size="20" class="text-white" />
@@ -39,7 +40,7 @@
             <b-nav-item-dropdown no-caret class="user-dropdown" menu-class="shadow-lg border-0 rounded-lg mt-2 me-4">
               <template #button-content>
                 <div class="d-flex align-items-center text-white user-btn">
-                  <span class="font-weight-bold mr-2 d-none d-md-inline">{{ userName }}</span>
+                  <span class="font-weight-bold me-2 d-none d-md-inline">{{ userName }}</span>
                   <div class="user-avatar shadow-sm">
                     <user-icon size="18" />
                   </div>
@@ -443,8 +444,13 @@ export default {
     goToNewComplaint () {
       if (this.isLoggedIn) this.$router.push({ name: 'register-complaint' })
       else {
-        this.$swal({ title: 'Identifique-se', icon: 'warning', showCancelButton: true }).then((result) => {
-          if (result.isConfirmed) this.$router.push({ name: 'auth-login' })
+        this.$swal({
+          title: 'Identifique-se',
+          text: 'Para registrar uma reclamação oficial, você precisa entrar ou se cadastrar.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Ok',
+          cancelButtonText: 'Cancelar'
         })
       }
     },
