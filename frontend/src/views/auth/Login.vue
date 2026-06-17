@@ -1,148 +1,103 @@
 <template>
-  <div class="auth-wrapper auth-v1 px-2">
-    <div class="auth-inner py-2">
+  <div class="Tela auth-wrapper d-flex align-items-center justify-content-center py-5" style="min-height: 100vh">
+    <b-card class="shadow p-4 border-0 card_login" style="max-width: 400px; width: 100%">
+      <div class="header_card text-center mb-4">
+        <h3 class="font-weight-bold text-sabara text-white">Bem-vindo</h3>
+        <p class="text-white">Faça login para continuar</p>
+      </div>
 
-      <b-card class="mb-0 sabara-card">
+      <b-form @submit.prevent="handleLogin">
+        <b-form-group label="E-mail" class="text-white m-2">
+          <b-form-input type="email" v-model="form.email" required placeholder="seu@email.com" />
+        </b-form-group>
 
-        <div class="text-center mb-2">
-            <b-img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Bras%C3%A3o_de_Sabar%C3%A1.png/180px-Bras%C3%A3o_de_Sabar%C3%A1.png"
-                   height="80" alt="Brasão Sabará" class="mb-1"/>
-            <h2 class="brand-text text-sabara font-weight-bold">FalaBará</h2>
-            <p class="card-text text-muted">Sistema de Ouvidoria Municipal</p>
+        <b-form-group label="Senha" class="text-white m-2">
+          <b-form-input type="password" v-model="form.senha" required placeholder="Sua senha" />
+        </b-form-group>
+
+        <div class="d-flex justify-content-center">
+          <b-button type="submit" variant="primary" block :disabled="loading" class="mt-4 bg-sabara border-0">
+            <b-spinner small v-if="loading" />
+            {{ loading ? 'Entrando...' : 'Entrar' }}
+          </b-button>
         </div>
+      </b-form>
 
-        <validation-observer ref="loginForm">
-          <b-form class="auth-login-form mt-2" @submit.prevent="handleLogin">
-
-            <b-form-group label="E-mail" label-for="login-email">
-              <validation-provider #default="{ errors }" name="Email" rules="required|email">
-                <b-form-input
-                  id="login-email"
-                  v-model="userEmail"
-                  placeholder="cidadao@sabara.mg.gov.br"
-                />
-                <small class="text-danger">{{ errors[0] }}</small>
-              </validation-provider>
-            </b-form-group>
-
-            <b-form-group>
-              <div class="d-flex justify-content-between">
-                <label for="login-password">Senha</label>
-              </div>
-              <validation-provider #default="{ errors }" name="Senha" rules="required">
-                <b-form-input
-                  id="login-password"
-                  v-model="password"
-                  type="password"
-                  placeholder="············"
-                />
-                <small class="text-danger">{{ errors[0] }}</small>
-              </validation-provider>
-            </b-form-group>
-
-            <b-button variant="sabara" type="submit" block :disabled="loading">
-              <span v-if="loading" class="spinner-border spinner-border-sm"/>
-              <span v-else>Acessar Portal</span>
-            </b-button>
-          </b-form>
-        </validation-observer>
-
-        <b-card-text class="text-center mt-2">
-          <span>Novo em Sabará? </span>
-          <router-link :to="{ name: 'auth-register' }">
-            <span class="text-sabara-secondary font-weight-bold">Crie sua conta</span>
-          </router-link>
-        </b-card-text>
-
-      </b-card>
-    </div>
+      <div class="text-center mt-3 text-white">
+        <small>Não tem conta? <router-link id="faca_login" :to="{name: 'auth-register'}">Cadastre-se</router-link></small>
+      </div>
+    </b-card>
   </div>
 </template>
 
 <script>
-import { ValidationProvider, ValidationObserver } from 'vee-validate'
-import { ref } from '@vue/composition-api'
-import store from '@/store'
-import router from '@/router'
-import { useToast } from 'vue-toastification/composition'
+import axios from '@/libs/axios'
 
 export default {
-  name: 'AuthLogin', // Corrigido o nome
-  components: { ValidationProvider, ValidationObserver },
-  setup () {
-    if (!store.hasModule('auth')) store.registerModule('auth', require('@/store/modules/auth').default)
-
-    const toast = useToast()
-    const userEmail = ref('')
-    const password = ref('')
-    const loading = ref(false)
-
+  name: 'AuthLogin',
+  data () {
     return {
-      userEmail, password, loading, toast
+      loading: false,
+      form: { email: '', senha: '' }
     }
   },
   methods: {
-    handleLogin () {
-      this.$refs.loginForm.validate().then(success => {
-        if (success) {
-          this.loading = true
-          store.dispatch('auth/login', {
-            email: this.userEmail,
-            senha: this.password
-          })
-            .then(response => {
-              this.toast.success(`Bem-vindo, ${response.data.nome}!`, { timeout: 3000 })
-              router.push({ name: 'home' })
-            })
-            .catch(error => {
-              const msg = error.response?.data?.message || 'Erro ao conectar ao servidor.'
-              this.toast.error(msg)
-            })
-            .finally(() => {
-              this.loading = false // Corrigido
-            })
+    async handleLogin () {
+      this.loading = true
+      try {
+        const { data } = await axios.post('/auth/login', this.form)
+
+        // 1. Salva o Token
+        localStorage.setItem('token', data.token)
+
+        // 2. CORREÇÃO: Salva os dados do usuário para a LandingPage usar
+        // O backend retorna: { token, id, nome, email, tipo }
+        const userData = {
+          id: data.id,
+          nome: data.nome,
+          email: data.email,
+          role: data.tipo
         }
-      })
+        localStorage.setItem('userData', JSON.stringify(userData))
+
+        // Redireciona
+        this.$toast.success(`Bem-vindo, ${data.nome || 'Cidadão'}!`)
+        this.$router.push({ name: 'landing' })
+      } catch (error) {
+        const msg = error.response?.data?.message || 'Email ou senha inválidos.'
+        this.$toast.error(msg)
+      } finally {
+        this.loading = false
+      }
     }
   }
 }
 </script>
 
 <style scoped>
-.auth-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background: url('https://sabara.mg.gov.br/wp-content/uploads/2021/04/capa-sabara.jpg') no-repeat center center;
-  background-size: cover;
+.Tela{
+  background-color: rgb(27, 25, 25);
+}
+.header_card{
   position: relative;
-}
-.auth-wrapper::before {
-  content: "";
-  position: absolute;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-}
-.auth-inner {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  max-width: 400px;
-}
-.sabara-card {
-  border-top: 5px solid #8B0000;
-  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.1);
-}
-.text-sabara { color: #8B0000; }
-.text-sabara-secondary { color: #D4AF37; }
-.btn-sabara {
+  border-radius: 7px 7px 0 0;
+  padding-top: 30px;
+  right: 40px;
+  bottom: 42px;
   background-color: #8B0000;
-  border-color: #8B0000;
+  width: 400px !important;
+}
+.card_login{
+  background-color: #474345;
+}
+#faca_login {
+  text-decoration: none;
   color: white;
 }
-.btn-sabara:hover {
-  background-color: #6d0202;
-  border-color: #6d0202;
+#faca_login:hover{
+  text-decoration: underline;
+  color: #8B0000;
 }
+.bg-sabara { background-color: #8B0000; }
+.text-sabara { color: #8B0000; }
 </style>

@@ -21,11 +21,21 @@ namespace Falabara.WebAPI.Controllers
 
         [Authorize]
         [HttpPost]
+        [RequestSizeLimit(200 * 1024 * 1024)] 
+        [RequestFormLimits(MultipartBodyLengthLimit = 200 * 1024 * 1024)]
         public async Task<IActionResult> Create([FromForm] CreateComplaintRequest request)
         {
             try
             {
-                var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                
+                if (string.IsNullOrEmpty(userIdClaim))
+                {
+                    return Unauthorized(new { mensagem = "Token inválido ou usuário não identificado." });
+                }
+
+                var userId = Guid.Parse(userIdClaim);
 
                 var command = new CreateComplaintCommand
                 {
@@ -34,7 +44,6 @@ namespace Falabara.WebAPI.Controllers
                     Description = request.Description,
                     Location = request.Location,
                     Neighborhood = request.Neighborhood,
-                    // Passando os novos dados
                     Latitude = request.Latitude,
                     Longitude = request.Longitude,
                     Image = request.Image,
@@ -79,6 +88,7 @@ namespace Falabara.WebAPI.Controllers
         [HttpGet("search")]
         public async Task<IActionResult> Search(
             [FromQuery] string? search,
+            [FromQuery] string? neighborhood,
             [FromQuery] ComplaintCategory? category,
             [FromQuery] ComplaintStatus? status,
             [FromQuery] string? orderBy,
@@ -88,15 +98,16 @@ namespace Falabara.WebAPI.Controllers
         {
             try
             {
-                Guid? filtroUsuario = null;
-                if (onlyMine)
+                var userIdString = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                Guid? loggedUserId = null;
+                
+                if (!string.IsNullOrEmpty(userIdString))
                 {
-                    var userIdString = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                    if (string.IsNullOrEmpty(userIdString))
-                        return Unauthorized(new { message = "Faça login para ver suas reclamações." });
-                    filtroUsuario = Guid.Parse(userIdString);
+                    loggedUserId = Guid.Parse(userIdString);
                 }
-                var query = new SearchComplaintsQuery(search, category, status, orderBy, filtroUsuario, page, perPage);
+
+                Guid? filtroUsuario = onlyMine ? loggedUserId : null;
+                var query = new SearchComplaintsQuery(search, neighborhood, category, status, orderBy, filtroUsuario, loggedUserId, page, perPage);
 
                 var result = await _mediator.Send(query);
                 return Ok(result);

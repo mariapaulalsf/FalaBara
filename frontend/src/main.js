@@ -11,23 +11,22 @@ import 'sweetalert2/dist/sweetalert2.min.css'
 import 'vue-toastification/dist/index.css'
 import { BarChart2Icon, RefreshCwIcon } from 'vue-feather-icons'
 
-Vue.component('BarChart2Icon', BarChart2Icon)
-Vue.component('RefreshCwIcon', RefreshCwIcon)
-
-
 import App from './App.vue'
 import router from './router'
 import store from './store'
 import './libs/axios'
 import './libs/validations'
 
+Vue.component('BarChart2Icon', BarChart2Icon)
+Vue.component('RefreshCwIcon', RefreshCwIcon)
+
 Vue.use(VueCompositionAPI)
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
 Vue.use(VueSweetalert2)
 Vue.use(Toast)
-Vue.use(VueApexCharts) 
-Vue.component('apexchart', VueApexCharts)
+Vue.use(VueApexCharts)
+Vue.component('ApexChart', VueApexCharts)
 
 Vue.config.productionTip = false
 

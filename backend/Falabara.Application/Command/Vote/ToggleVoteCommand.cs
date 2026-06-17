@@ -1,5 +1,6 @@
 using MediatR;
 using Falabara.Domain.Entities;
+using System.Collections.Generic; 
 
 namespace Falabara.Application.Commands.Vote
 {
@@ -13,8 +14,8 @@ namespace Falabara.Application.Commands.Vote
     public class ToggleVoteHandler : IRequestHandler<ToggleVoteCommand, string>
     {
         private readonly IVoteRepository _voteRepository;
-        private readonly INotificationRepository _notificationRepository; 
-        private readonly IComplaintRepository _complaintRepository;     
+        private readonly INotificationRepository _notificationRepository;
+        private readonly IComplaintRepository _complaintRepository;
 
         public ToggleVoteHandler(
             IVoteRepository voteRepository, 
@@ -60,13 +61,16 @@ namespace Falabara.Application.Commands.Vote
             if (isNewLike)
             {
                 int totalLikes = await _voteRepository.GetLikesCountAsync(request.ComplaintId);
-                var complaint = await _complaintRepository.GetByIdAsync(request.ComplaintId);
 
-                if (complaint != null && complaint.UserId != request.UserId) 
+                var milestones = new List<int> { 1, 5, 10, 20, 50, 100, 500, 1000 };
+
+                if (milestones.Contains(totalLikes))
                 {
-                    if (totalLikes == 1 || totalLikes == 5 || totalLikes == 10 || totalLikes % 10 == 0)
+                    var complaint = await _complaintRepository.GetByIdAsync(request.ComplaintId);
+
+                    if (complaint != null && complaint.UserId != request.UserId) 
                     {
-                        var message = $"Parabéns! Sua reclamação '{complaint.Title}' atingiu {totalLikes} apoiadores!";
+                        var message = $"Parabéns! Sua reclamação '{complaint.Title}' está ganhando força e atingiu {totalLikes} apoiadores!";
                         var notification = new Notification(complaint.UserId, message);
                         await _notificationRepository.AddAsync(notification);
                     }

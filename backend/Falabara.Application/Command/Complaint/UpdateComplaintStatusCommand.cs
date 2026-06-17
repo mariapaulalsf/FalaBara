@@ -1,5 +1,8 @@
 using MediatR;
 using Falabara.Domain.Entities;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Falabara.Application.Commands.Complaint
 {
@@ -27,13 +30,28 @@ namespace Falabara.Application.Commands.Complaint
             var complaint = await _repository.GetByIdAsync(request.ComplaintId);
             if (complaint == null) throw new Exception("Reclamação não encontrada.");
 
-            // 1. Atualiza o Status
             complaint.UpdateStatus(request.NewStatus, request.OfficialResponse);
             await _repository.UpdateAsync(complaint);
 
-            var message = $"O status da sua reclamação '{complaint.Title}' mudou para: {request.NewStatus}.";
+            string statusName = request.NewStatus switch {
+                ComplaintStatus.EmAnalise => "Em Análise",
+                ComplaintStatus.EmAndamento => "Em Andamento",
+                ComplaintStatus.Resolvido => "Resolvido",
+                ComplaintStatus.Cancelado => "Cancelado",
+                _ => "Aberto"
+            };
+
+            string message;
+            if (!string.IsNullOrEmpty(request.OfficialResponse))
+            {
+                message = $"A Prefeitura respondeu sua reclamação '{complaint.Title}': \"{request.OfficialResponse}\"";
+            }
+            else
+            {
+                message = $"O status da sua reclamação '{complaint.Title}' mudou para: {statusName}.";
+            }
+
             var notification = new Notification(complaint.UserId, message);
-            
             await _notificationRepository.AddAsync(notification);
 
             return true;

@@ -5,12 +5,12 @@ using Falabara.Domain.Entities;
 using MediatR;
 using Falabara.Application.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens; 
+using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.OpenApi.Models; 
-using Npgsql; 
+using Microsoft.OpenApi.Models;
+using Npgsql;
 using System.Data;
-using Microsoft.CodeAnalysis.CodeStyle;
+using Microsoft.AspNetCore.Http.Features; 
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,25 +21,26 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IComplaintRepository, ComplaintRepository>();
 builder.Services.AddScoped<IVoteRepository, VoteRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
-builder.Services.AddScoped<TokenService>(); 
-builder.Services.AddScoped<Falabara.Application.Services.IFileService, Falabara.Application.Services.LocalFileService>();
-var app = builder.Build();
+builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<IFileService, LocalFileService>();
 
-//MEDIATOR
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Falabara.Application.Commands.User.CreateUserCommand).Assembly));
+builder.Services.AddMediatR(cfg =>
+    cfg.RegisterServicesFromAssembly(
+        typeof(Falabara.Application.Commands.User.CreateUserCommand).Assembly
+    ));
 
-//AUTENTICAÇÃO JWT 
 var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]);
-builder.Services.AddAuthentication(x =>
+
+builder.Services.AddAuthentication(options =>
 {
-    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-.AddJwtBearer(x =>
+.AddJwtBearer(options =>
 {
-    x.RequireHttpsMetadata = false;
-    x.SaveToken = true;
-    x.TokenValidationParameters = new TokenValidationParameters
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(key),
@@ -48,7 +49,7 @@ builder.Services.AddAuthentication(x =>
     };
 });
 
-builder.Services.AddScoped<IDbConnection>(sp => 
+builder.Services.AddScoped<IDbConnection>(sp =>
     new NpgsqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllers();
@@ -77,18 +78,28 @@ builder.Services.AddSwaggerGen(c =>
                     Id = "Bearer"
                 }
             },
-            new string[] {}
+            Array.Empty<string>()
         }
     });
+});
+
+
+builder.Services.Configure<FormOptions>(o =>
+{
+    o.ValueLengthLimit = int.MaxValue;
+    o.MultipartBodyLengthLimit = 200 * 1024 * 1024; // 200 MB
+    o.MemoryBufferThreshold = int.MaxValue;
 });
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
-    });
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader());
 });
+
+var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
@@ -97,11 +108,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowAll");
-app.UseAuthentication(); 
+
+app.UseAuthentication();
 app.UseAuthorization();
 app.UseStaticFiles();
 
 app.UseHttpsRedirection();
+
 app.MapControllers();
 
 app.Run();

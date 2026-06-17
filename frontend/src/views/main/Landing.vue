@@ -1,779 +1,738 @@
 <template>
-  <div class="landing-page">
+  <div class="landing-page modern-ui">
+    <b-navbar toggleable="lg" type="dark" variant="dark" class="p-3 custom-navbar glass-navbar">
+      <img src="../../../public/megafone (1).png" alt="Megaphone" class="me-2 ps-3">
+      <b-navbar-brand href="#" class="font-weight-bold brand-logo">FalaBará</b-navbar-brand>
+      <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+      <b-collapse id="nav-collapse" is-nav>
+        <b-navbar-nav class="ml-auto d-flex justify-content-end w-100">
+          <div v-if="isLoggedIn" class="d-flex align-items-center gap-3">
+            <b-nav-item-dropdown no-caret right menu-class="notification-menu shadow-lg border-0 rounded-lg"
+              class="notification-dropdown me-1" @show="markNotificationsAsRead">
+              <template #button-content>
+                <div class="icon-wrapper position-relative d-flex align-items-center justify-content-center">
+                  <bell-icon size="20" class="text-white" />
+                  <span v-if="unreadCount > 0" class="notification-badge">{{ unreadCount }}</span>
+                </div>
+              </template>
+              <b-dropdown-header
+                class="d-flex justify-content-between align-items-center px-3 py-3 border-bottom bg-white rounded-top">
+                <span class="font-weight-bold text-dark h6 mb-0">Notificações</span>
+              </b-dropdown-header>
+              <div class="notification-list-container custom-scrollbar">
+                <div v-if="notifications.length === 0" class="text-center p-4 text-muted">
+                  <small>Nenhuma notificação recente.</small>
+                </div>
+                <b-dropdown-item v-for="n in notifications" :key="n.id" class="notification-item border-bottom">
+                  <div class="d-flex flex-column py-2">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                      <strong :class="{ 'text-primary': !n.isRead, 'text-dark': n.isRead }" class="notification-title">
+                        <span v-if="!n.isRead" class="dot-unread"></span> Sistema
+                      </strong>
+                      <small class="text-muted" style="font-size: 0.70rem;">{{ formatDate(n.createdAt) }}</small>
+                    </div>
+                    <span class="text-secondary small mt-1 text-wrap notification-msg">{{ n.message }}</span>
+                  </div>
+                </b-dropdown-item>
+              </div>
+            </b-nav-item-dropdown>
 
-    <b-navbar toggleable="lg" type="light" class="sabara-navbar fixed-top">
-      <b-container>
-        <b-navbar-brand href="#" class="font-weight-bold d-flex align-items-center">
-          <b-img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Bras%C3%A3o_de_Sabar%C3%A1.png/180px-Bras%C3%A3o_de_Sabar%C3%A1.png"
-                 height="45" class="mr-2" />
-          <span class="brand-name">FalaBará</span>
-        </b-navbar-brand>
-
-        <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
-
-        <b-collapse id="nav-collapse" is-nav>
-          <b-navbar-nav class="ml-auto align-items-center">
-            <b-nav-item href="#recursos" class="mr-3">
-              <span class="nav-link-text">Recursos</span>
-            </b-nav-item>
-            <b-nav-item href="#como-funciona" class="mr-3">
-              <span class="nav-link-text">Como Funciona</span>
-            </b-nav-item>
-            <b-nav-item :to="{ name: 'auth-login' }" class="mr-2">
-              <span class="nav-link-text">Entrar</span>
-            </b-nav-item>
-            <b-button :to="{ name: 'auth-register' }" variant="gold" class="btn-gold font-weight-bold px-4">
-              Cadastrar-se
-            </b-button>
-          </b-navbar-nav>
-        </b-collapse>
-      </b-container>
+            <b-nav-item-dropdown no-caret class="user-dropdown" menu-class="shadow-lg border-0 rounded-lg mt-2 me-4">
+              <template #button-content>
+                <div class="d-flex align-items-center text-white user-btn">
+                  <span class="font-weight-bold me-2 d-none d-md-inline">{{ userName }}</span>
+                  <div class="user-avatar shadow-sm">
+                    <user-icon size="18" />
+                  </div>
+                </div>
+              </template>
+              <b-dropdown-item @click="openProfileModal" class="py-2 "><user-icon size="16" class="mr-2 text-muted" />
+                Meu
+                Perfil</b-dropdown-item>
+              <b-dropdown-divider></b-dropdown-divider>
+              <b-dropdown-item @click="logout" class="py-2 text-danger"><log-out-icon size="16" class="mr-2" />
+                Sair</b-dropdown-item>
+            </b-nav-item-dropdown>
+          </div>
+          <div v-else class="d-flex align-items-center ml-auto auth-buttons gap-3">
+            <b-button variant="outline-light" :to="{ name: 'auth-login' }"
+              class="px-4 btn-semi-rounded font-weight-bold mr-3">Entrar</b-button>
+            <b-button variant="light" :to="{ name: 'auth-register' }"
+              class="px-4 btn-semi-rounded font-weight-bold text-sabara">Cadastrar</b-button>
+          </div>
+        </b-navbar-nav>
+      </b-collapse>
     </b-navbar>
 
-    <div class="hero-section">
-      <div class="hero-pattern"></div>
-      <b-container class="hero-content">
-        <b-row class="align-items-center min-vh-100">
-          <b-col lg="6" class="text-white py-5">
-            <div class="badge-hero mb-4">
-              <feather-icon icon="ShieldIcon" size="16" class="mr-2" />
-              Plataforma Oficial da Prefeitura de Sabará
-            </div>
-            <h1 class="hero-title mb-4">
-              Sua voz transforma <br>
-              <span class="text-gradient">Sabará</span>
-            </h1>
-            <p class="hero-subtitle mb-5">
-              Relate problemas urbanos, vote nas prioridades e acompanhe as melhorias da nossa cidade histórica em tempo real.
-            </p>
-
-            <div class="d-flex flex-wrap gap-3 mb-5">
-              <b-button :to="{ name: 'auth-register' }" size="lg" class="btn-hero-primary px-5 py-3">
-                <feather-icon icon="UserPlusIcon" size="20" class="mr-2" />
-                Começar Agora
-              </b-button>
-              <b-button :to="{ name: 'auth-login' }" size="lg" class="btn-hero-secondary px-5 py-3">
-                Já tenho conta
-                <feather-icon icon="ArrowRightIcon" size="20" class="ml-2" />
-              </b-button>
-            </div>
-
-            <div class="hero-badges">
-              <div class="badge-item">
-                <feather-icon icon="CheckCircleIcon" size="20" class="text-gold" />
-                <span>100% Gratuito</span>
-              </div>
-              <div class="badge-item">
-                <feather-icon icon="LockIcon" size="20" class="text-gold" />
-                <span>Seguro e Oficial</span>
-              </div>
-              <div class="badge-item">
-                <feather-icon icon="ZapIcon" size="20" class="text-gold" />
-                <span>Resposta Rápida</span>
-              </div>
-            </div>
-          </b-col>
-
-          <b-col lg="6" class="d-none d-lg-block">
-            <div class="hero-visual">
-              <div class="floating-element elem-1">
-                <div class="glass-card">
-                  <div class="d-flex align-items-center">
-                    <div class="status-icon bg-gradient-success">
-                      <feather-icon icon="CheckIcon" size="24" class="text-white" />
-                    </div>
-                    <div class="ml-3">
-                      <div class="status-label">Resolvido</div>
-                      <div class="status-title">Buraco na Rua Central</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="floating-element elem-2">
-                <div class="glass-card">
-                  <div class="d-flex align-items-center">
-                    <div class="status-icon bg-gradient-warning">
-                      <feather-icon icon="AlertCircleIcon" size="24" class="text-white" />
-                    </div>
-                    <div class="ml-3">
-                      <div class="status-label">Em Progresso</div>
-                      <div class="status-title">Iluminação Praça</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="floating-element elem-3">
-                <div class="glass-card">
-                  <div class="d-flex align-items-center">
-                    <div class="status-icon bg-gradient-blue">
-                      <feather-icon icon="ThumbsUpIcon" size="24" class="text-white" />
-                    </div>
-                    <div class="ml-3">
-                      <div class="status-label">Mais Votado</div>
-                      <div class="status-title">Limpeza de Terreno</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="hero-circle circle-1"></div>
-              <div class="hero-circle circle-2"></div>
-              <div class="hero-circle circle-3"></div>
-            </div>
-          </b-col>
-        </b-row>
+    <div class="hero bg-sabara text-white text-center py-5">
+      <b-container class="content-overlay">
+        <h1 class="display-4 font-weight-bold">Transforme Sabará com sua voz</h1>
+        <p class="lead mb-4">Relate problemas, acompanhe soluções e ajude a prefeitura a priorizar.</p>
+        <b-button size="lg" variant="danger" class="btn-cta-red font-weight-bold shadow p-3" @click="goToNewComplaint">
+          <plus-circle-icon class="mr-2" /> REGISTRAR RECLAMAÇÃO
+        </b-button>
       </b-container>
     </div>
 
-    <section id="recursos" class="features-section">
-      <b-container>
-        <div class="text-center mb-5 pb-4">
-          <div class="section-badge mb-3">
-            <feather-icon icon="StarIcon" size="16" class="mr-2" />
-            RECURSOS
+    <div class="main-content-wrapper py-5">
+      <b-card class="mt-1 w-75 mx-auto border-0 shadow-card rounded-xl bg-white main-card">
+        <b-container class="py-4">
+          <div class="section-header mb-4">
+            <h3 class="font-weight-bold text-dark">Últimas Ocorrências</h3>
+            <div class="header-line"></div>
           </div>
-          <h2 class="section-title mb-3">Como o FalaBará funciona</h2>
-          <p class="section-subtitle">Simples, rápido e eficiente para toda a comunidade</p>
+          <complaint-feed />
+          <hr class="my-5 border-light">
+          <div class="section-header mb-4">
+            <h3 class="font-weight-bold text-dark">Transparência em Tempo Real</h3>
+            <div class="header-line"></div>
+          </div>
+          <sabara-dashboard />
+        </b-container>
+
+        <div v-if="userType == 2 || userType == 'CityHall' || userType == 'Prefeitura'" class="px-4 pb-4">
+          <hr class="my-5 border-light">
+
+          <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+            <div class="section-header mb-2 mb-md-0">
+              <h3 class="font-weight-bold text-dark">Gestão de Usuários</h3>
+            </div>
+            <b-button variant="success" class="font-weight-bold shadow-sm btn-semi-rounded"
+              @click="openCreateUserModal">
+              <plus-circle-icon size="16" class="mr-2" /> Novo Usuário
+            </b-button>
+          </div>
+
+          <b-card no-body class="mb-4 shadow-sm border-0 bg-light rounded-lg">
+            <div class="p-2">
+              <b-row align-v="center" class="mx-0">
+                <b-col md="8" class="pl-0 pr-md-2 mb-2 mb-md-0">
+                  <div class="search-wrapper position-relative">
+                    <search-icon size="18" class="search-icon-input" />
+                    <b-form-input v-model="filters.search" placeholder="Pesquisar por nome, email ou CPF..."
+                      class="input-clean bg-white border-0 shadow-sm" @input="handleSearchInput" />
+                  </div>
+                </b-col>
+
+                <b-col md="4" class="pr-0 pl-md-2">
+                  <b-form-select v-model="filters.type" :options="filterRoleOptions"
+                    class="input-filter-select shadow-sm" @change="fetchUsers" />
+                </b-col>
+              </b-row>
+            </div>
+          </b-card>
+
+          <b-card no-body class="border-0 shadow-sm rounded-lg overflow-hidden">
+            <b-table responsive hover striped :items="users" :fields="tableColumns" primary-key="id" show-empty
+              empty-text="Nenhum usuário encontrado." head-variant="white" class="align-middle mb-0 user-table"
+              label-sort-asc="" label-sort-desc="" label-sort-clear="">
+              <template #cell(type)="data">
+                <span class="badge px-3 py-2" :class="getRoleBadgeClass(data.value)">
+                  {{ getRoleName(data.value) }}
+                </span>
+              </template>
+
+              <template #cell(foneNumber)="data">
+                <span v-if="data.value" class="text-dark font-weight-500">{{ formatPhone(data.value) }}</span>
+                <span v-else class="text-muted small">Não informado</span>
+              </template>
+
+              <template #cell(department)="data">
+                <span v-if="data.value" class="text-dark font-weight-bold small">{{ data.value }}</span>
+                <span v-else class="text-muted">-</span>
+              </template>
+            </b-table>
+
+            <div v-if="tableLoading" class="text-center py-5">
+              <b-spinner variant="danger" label="Carregando..."></b-spinner>
+            </div>
+          </b-card>
         </div>
 
+      </b-card>
+    </div>
+
+    <b-modal id="profile-modal" hide-footer centered content-class="shadow-lg border-0 rounded-lg">
+      <template #modal-header="{ close }">
+        <h5 class="font-weight-bold mb-0 text-dark">Meu Perfil</h5>
+        <div class="close-btn-wrapper" @click="close" v-b-tooltip.hover title="Fechar">
+          <x-icon size="20" class="text-muted" />
+        </div>
+      </template>
+      <div class="text-center mb-4">
+        <div
+          class="avatar-large bg-light-sabara text-sabara mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle shadow-sm"
+          style="width: 90px; height: 90px;">
+          <user-icon size="42" />
+        </div>
+        <h5 class="font-weight-bold mb-0 text-dark">{{ userName }}</h5>
+      </div>
+      <b-form @submit.prevent="updateProfile">
+        <b-form-group label="Nome Completo" label-for="profile-name"
+          class="font-weight-bold text-muted small text-uppercase">
+          <b-form-input id="profile-name" v-model="profileForm.name" required class="input-modern"></b-form-input>
+        </b-form-group>
+        <b-form-group label="Telefone (WhatsApp)" label-for="profile-phone"
+          description="Opcional. Usado para contato rápido."
+          class="mt-3 font-weight-bold text-muted small text-uppercase">
+          <b-form-input id="profile-phone" v-model="profileForm.foneNumber" placeholder="(31) 99999-9999"
+            class="input-modern"></b-form-input>
+        </b-form-group>
         <b-row>
-          <b-col md="4" class="mb-4">
-            <div class="feature-card">
-              <div class="feature-number">01</div>
-              <div class="feature-icon-wrapper">
-                <div class="feature-icon bg-gradient-blue">
-                  <feather-icon icon="MapPinIcon" size="32" class="text-white" />
-                </div>
-              </div>
-              <h3 class="feature-title">Relate Problemas</h3>
-              <p class="feature-description">
-                Encontrou um problema na cidade? Tire uma foto, marque a localização e envie seu relato em poucos segundos.
-              </p>
-              <ul class="feature-list">
-                <li>
-                  <feather-icon icon="MapIcon" size="16" />
-                  <span>GPS automático</span>
-                </li>
-                <li>
-                  <feather-icon icon="CameraIcon" size="16" />
-                  <span>Fotos e vídeos</span>
-                </li>
-                <li>
-                  <feather-icon icon="TagIcon" size="16" />
-                  <span>Categorização</span>
-                </li>
-              </ul>
-            </div>
-          </b-col>
-
-          <b-col md="4" class="mb-4">
-            <div class="feature-card featured">
-              <div class="popular-badge">
-                <feather-icon icon="TrendingUpIcon" size="14" class="mr-1" />
-                Mais Usado
-              </div>
-              <div class="feature-number">02</div>
-              <div class="feature-icon-wrapper">
-                <div class="feature-icon bg-gradient-gold">
-                  <feather-icon icon="ThumbsUpIcon" size="32" class="text-white" />
-                </div>
-              </div>
-              <h3 class="feature-title">Vote e Apoie</h3>
-              <p class="feature-description">
-                Dê visibilidade aos problemas mais urgentes. Quanto mais votos, maior a prioridade de resolução.
-              </p>
-              <ul class="feature-list">
-                <li>
-                  <feather-icon icon="TrendingUpIcon" size="16" />
-                  <span>Sistema transparente</span>
-                </li>
-                <li>
-                  <feather-icon icon="BarChart2Icon" size="16" />
-                  <span>Ranking de prioridades</span>
-                </li>
-                <li>
-                  <feather-icon icon="BellIcon" size="16" />
-                  <span>Notificações</span>
-                </li>
-              </ul>
-            </div>
-          </b-col>
-
-          <b-col md="4" class="mb-4">
-            <div class="feature-card">
-              <div class="feature-number">03</div>
-              <div class="feature-icon-wrapper">
-                <div class="feature-icon bg-gradient-success">
-                  <feather-icon icon="CheckCircleIcon" size="32" class="text-white" />
-                </div>
-              </div>
-              <h3 class="feature-title">Acompanhe Soluções</h3>
-              <p class="feature-description">
-                Receba atualizações em tempo real sobre o andamento e resolução dos problemas reportados.
-              </p>
-              <ul class="feature-list">
-                <li>
-                  <feather-icon icon="ActivityIcon" size="16" />
-                  <span>Status em tempo real</span>
-                </li>
-                <li>
-                  <feather-icon icon="ClockIcon" size="16" />
-                  <span>Histórico completo</span>
-                </li>
-                <li>
-                  <feather-icon icon="MessageSquareIcon" size="16" />
-                  <span>Feedback da prefeitura</span>
-                </li>
-              </ul>
-            </div>
-          </b-col>
+          <b-col md="6"><b-form-group label="E-mail"
+              class="mt-3 font-weight-bold text-muted small text-uppercase"><b-form-input id="profile-email"
+                :value="userEmail" readonly class="input-disabled"></b-form-input></b-form-group></b-col>
+          <b-col md="6"><b-form-group label="CPF"
+              class="mt-3 font-weight-bold text-muted small text-uppercase"><b-form-input id="profile-cpf"
+                :value="userCpf" readonly class="input-disabled"></b-form-input></b-form-group></b-col>
         </b-row>
-      </b-container>
-    </section>
-
-    <section id="como-funciona" class="steps-section">
-      <div class="steps-bg"></div>
-      <b-container>
-        <div class="text-center mb-5 pb-4">
-          <div class="section-badge section-badge-light mb-3">
-            <feather-icon icon="GitBranchIcon" size="16" class="mr-2" />
-            PASSO A PASSO
-          </div>
-          <h2 class="section-title text-white mb-3">Comece em 3 passos simples</h2>
-          <p class="section-subtitle text-white-50">Criar conta e fazer seu primeiro relato leva menos de 2 minutos</p>
+        <div class="d-flex justify-content-end align-items-center mt-4 pt-3 border-top modal-footer-actions gap-2">
+          <b-button variant="light" class="font-weight-bold text-muted btn-semi-rounded mr-2"
+            @click="$bvModal.hide('profile-modal')">Cancelar</b-button>
+          <b-button type="submit" variant="success" class="px-4 font-weight-bold shadow-sm btn-semi-rounded"
+            :disabled="profileLoading"><b-spinner small v-if="profileLoading" class="mr-1"></b-spinner> Salvar
+            Alterações</b-button>
         </div>
+      </b-form>
+    </b-modal>
 
-        <div class="steps-container">
-          <div class="step-card">
-            <div class="step-number-badge">
-              <span>1</span>
-            </div>
-            <div class="step-icon">
-              <feather-icon icon="UserPlusIcon" size="32" />
-            </div>
-            <h4 class="step-title">Cadastre-se</h4>
-            <p class="step-description">
-              Crie sua conta gratuita com e-mail e CPF em menos de 1 minuto.
-            </p>
-          </div>
-
-          <div class="step-connector">
-            <div class="connector-line"></div>
-            <div class="connector-dot"></div>
-          </div>
-
-          <div class="step-card">
-            <div class="step-number-badge">
-              <span>2</span>
-            </div>
-            <div class="step-icon">
-              <feather-icon icon="CameraIcon" size="32" />
-            </div>
-            <h4 class="step-title">Relate</h4>
-            <p class="step-description">
-              Tire uma foto do problema, escolha a categoria e publique.
-            </p>
-          </div>
-
-          <div class="step-connector">
-            <div class="connector-line"></div>
-            <div class="connector-dot"></div>
-          </div>
-
-          <div class="step-card">
-            <div class="step-number-badge">
-              <span>3</span>
-            </div>
-            <div class="step-icon">
-              <feather-icon icon="BellIcon" size="32" />
-            </div>
-            <h4 class="step-title">Acompanhe</h4>
-            <p class="step-description">
-              Receba notificações sobre o progresso e veja a solução acontecer.
-            </p>
-          </div>
+    <b-modal id="create-user-modal" hide-footer centered content-class="shadow-lg border-0 rounded-lg">
+      <template #modal-header="{ close }">
+        <h5 class="font-weight-bold mb-0 text-dark">Cadastrar Novo Usuário</h5>
+        <div class="close-btn-wrapper" @click="close" v-b-tooltip.hover title="Fechar">
+          <x-icon size="20" class="text-muted" />
         </div>
-      </b-container>
-    </section>
-
-    <section class="cta-section">
-      <b-container>
-        <div class="cta-card">
-          <b-row class="align-items-center">
-            <b-col lg="8" class="text-center text-lg-left mb-4 mb-lg-0">
-              <h2 class="cta-title mb-3">Faça parte da transformação de Sabará</h2>
-              <p class="cta-subtitle mb-0">
-                Junte-se aos cidadãos que estão ajudando a melhorar nossa cidade histórica
-              </p>
-            </b-col>
-            <b-col lg="4" class="text-center text-lg-right">
-              <b-button :to="{ name: 'auth-register' }" size="lg" class="btn-cta px-5 py-3">
-                Criar minha conta
-                <feather-icon icon="ArrowRightIcon" size="20" class="ml-2" />
-              </b-button>
-            </b-col>
-          </b-row>
-        </div>
-      </b-container>
-    </section>
-
-    <footer class="footer-section">
-      <b-container>
-        <b-row class="mb-5">
-          <b-col lg="4" class="mb-4 mb-lg-0">
-            <div class="d-flex align-items-center mb-4">
-              <b-img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Bras%C3%A3o_de_Sabar%C3%A1.png/180px-Bras%C3%A3o_de_Sabar%C3%A1.png"
-                     height="45" class="mr-3" />
-              <h5 class="mb-0 footer-brand">FalaBará</h5>
-            </div>
-            <p class="footer-description">
-              Plataforma oficial de ouvidoria da Prefeitura Municipal de Sabará. Conectando cidadãos e governo.
-            </p>
-          </b-col>
-
-          <b-col lg="2" md="3" class="mb-4 mb-lg-0">
-            <h6 class="footer-heading">Navegação</h6>
-            <ul class="footer-links">
-              <li><a href="#recursos">Recursos</a></li>
-              <li><a href="#como-funciona">Como Funciona</a></li>
-              <li><router-link :to="{ name: 'auth-login' }">Entrar</router-link></li>
-              <li><router-link :to="{ name: 'auth-register' }">Cadastrar</router-link></li>
-            </ul>
-          </b-col>
-
-          <b-col lg="3" md="4" class="mb-4 mb-lg-0">
-            <h6 class="footer-heading">Suporte</h6>
-            <ul class="footer-links">
-              <li><a href="#">Central de Ajuda</a></li>
-              <li><a href="#">Perguntas Frequentes</a></li>
-              <li><a href="#">Política de Privacidade</a></li>
-              <li><a href="#">Termos de Uso</a></li>
-            </ul>
-          </b-col>
-
-          <b-col lg="3" md="5">
-            <h6 class="footer-heading">Contato</h6>
-            <div class="footer-contact">
-              <div class="contact-item">
-                <feather-icon icon="MapPinIcon" size="18" />
-                <span>Centro Histórico<br>Sabará - MG</span>
-              </div>
-              <div class="contact-item">
-                <feather-icon icon="PhoneIcon" size="18" />
-                <span>(31) 3672-7599</span>
-              </div>
-            </div>
-          </b-col>
+      </template>
+      <b-form @submit.prevent="createUser">
+        <b-row><b-col md="12"><b-form-group label="Nome Completo"
+              class="font-weight-bold text-muted small text-uppercase"><b-form-input v-model="createUserForm.name"
+                required class="input-modern"></b-form-input></b-form-group></b-col></b-row>
+        <b-row class="mt-3">
+          <b-col md="6"><b-form-group label="CPF" class="font-weight-bold text-muted small text-uppercase"><b-form-input
+                v-model="createUserForm.cpf" required class="input-modern"
+                placeholder="Apenas números"></b-form-input></b-form-group></b-col>
+          <b-col md="6"><b-form-group label="Telefone"
+              class="font-weight-bold text-muted small text-uppercase"><b-form-input v-model="createUserForm.phone"
+                class="input-modern" placeholder="Apenas números"></b-form-input></b-form-group></b-col>
         </b-row>
-
-        <div class="footer-bottom">
-          <p class="mb-0">&copy; 2026 FalaBará - Prefeitura Municipal de Sabará. Todos os direitos reservados.</p>
+        <b-row class="mt-3"><b-col md="12"><b-form-group label="E-mail"
+              class="font-weight-bold text-muted small text-uppercase"><b-form-input type="email"
+                v-model="createUserForm.email" required
+                class="input-modern"></b-form-input></b-form-group></b-col></b-row>
+        <b-row class="mt-3">
+          <b-col md="6"><b-form-group label="Senha"
+              class="font-weight-bold text-muted small text-uppercase"><b-form-input type="password"
+                v-model="createUserForm.password" required class="input-modern"></b-form-input></b-form-group></b-col>
+          <b-col md="6"><b-form-group label="Tipo de Perfil"
+              class="font-weight-bold text-muted small text-uppercase"><b-form-select v-model="createUserForm.role"
+                :options="roleOptions" class="input-modern form-control"></b-form-select></b-form-group></b-col>
+        </b-row>
+        <b-row class="mt-3" v-if="createUserForm.role === 2"><b-col md="12"><b-form-group label="Departamento"
+              class="font-weight-bold text-muted small text-uppercase text-sabara"><b-form-select
+                v-model="createUserForm.department" :options="departmentOptions" class="input-modern form-control"
+                required></b-form-select></b-form-group></b-col></b-row>
+        <div class="d-flex justify-content-end align-items-center mt-4 pt-3 border-top modal-footer-actions gap-2">
+          <b-button variant="light" class="font-weight-bold text-muted btn-semi-rounded mr-2"
+            @click="$bvModal.hide('create-user-modal')">Cancelar</b-button>
+          <b-button type="submit" variant="success" class="px-4 font-weight-bold shadow-sm btn-semi-rounded"
+            :disabled="createLoading"><b-spinner small v-if="createLoading" class="mr-1"></b-spinner>
+            Cadastrar</b-button>
         </div>
-      </b-container>
-    </footer>
+      </b-form>
+    </b-modal>
 
   </div>
 </template>
 
 <script>
-import { BNavbar, BNavbarBrand, BNavbarToggle, BCollapse, BNavbarNav, BNavItem, BContainer, BButton, BRow, BCol, BImg } from 'bootstrap-vue'
+import axios from '@/libs/axios'
+import SabaraDashboard from './SabaraDashboard.vue'
+import ComplaintFeed from './ComplaintsFeed.vue'
+import { PlusCircleIcon, BellIcon, UserIcon, LogOutIcon, XIcon, SearchIcon } from 'vue-feather-icons'
+import { BModal } from 'bootstrap-vue'
 
 export default {
   name: 'LandingPage',
-  components: {
-    BNavbar, BNavbarBrand, BNavbarToggle, BCollapse, BNavbarNav, BNavItem, BContainer, BButton, BRow, BCol, BImg
+  components: { SabaraDashboard, ComplaintFeed, PlusCircleIcon, BellIcon, UserIcon, LogOutIcon, XIcon, SearchIcon, BModal },
+  data () {
+    return {
+      isLoggedIn: false,
+      userName: 'Cidadão',
+      userEmail: '',
+      userCpf: '',
+      userType: '',
+      notifications: [],
+      profileLoading: false,
+      profileForm: { name: '', foneNumber: '' },
+
+      // --- TABELA ---
+      tableLoading: false,
+      searchTimer: null,
+      tableColumns: [
+        { key: 'name', label: 'Nome', sortable: true },
+        { key: 'email', label: 'E-mail', sortable: true },
+        { key: 'type', label: 'Perfil', sortable: true, class: 'text-center' },
+        { key: 'foneNumber', label: 'Telefone', sortable: false },
+        { key: 'department', label: 'Departamento', sortable: false }
+      ],
+      users: [],
+      filters: {
+        search: '',
+        type: null
+      },
+      filterRoleOptions: [
+        { value: null, text: 'Todos os Perfis' },
+        { value: 1, text: 'Cidadão' },
+        { value: 2, text: 'Prefeitura' }
+      ],
+      createLoading: false,
+      createUserForm: { name: '', cpf: '', email: '', phone: '', password: '', role: 1, department: null },
+      roleOptions: [{ value: 1, text: 'Cidadão' }, { value: 2, text: 'Prefeitura (Admin)' }],
+      departmentOptions: [
+        { value: 'Saúde', text: 'Secretaria de Saúde' },
+        { value: 'Obras', text: 'Secretaria de Obras' },
+        { value: 'Trânsito', text: 'Dep. de Trânsito' },
+        { value: 'Educação', text: 'Secretaria de Educação' },
+        { value: 'Meio Ambiente', text: 'Meio Ambiente' },
+        { value: 'Gabinete', text: 'Gabinete' }
+      ]
+    }
+  },
+  computed: {
+    unreadCount () { return this.notifications.filter(n => !n.isRead).length }
+  },
+  created () {
+    const token = localStorage.getItem('token')
+    this.isLoggedIn = !!token
+    if (this.isLoggedIn) {
+      this.loadUserData()
+      this.fetchNotifications()
+    }
+    if (this.userType === 2 || this.userType === 'CityHall' || this.userType === 'Prefeitura') {
+      this.fetchUsers()
+    }
+  },
+  methods: {
+    loadUserData () {
+      const userDataStr = localStorage.getItem('userData')
+      if (userDataStr) {
+        try {
+          const userData = JSON.parse(userDataStr)
+          if (!userData.id && !userData.Id) { this.logout(); return }
+          this.userName = userData.nome || userData.name || 'Cidadão'
+          this.userEmail = userData.email || ''
+          this.userCpf = userData.cpf || ''
+          this.userType = userData.role || userData.userType || userData.type
+          this.profileForm.name = this.userName
+        } catch (e) { this.logout() }
+      }
+    },
+
+    handleSearchInput () {
+      if (this.searchTimer) clearTimeout(this.searchTimer)
+      this.searchTimer = setTimeout(() => {
+        this.fetchUsers()
+      }, 600)
+    },
+
+    async fetchUsers () {
+      this.tableLoading = true
+      try {
+        const token = localStorage.getItem('token')
+        const params = { perPage: 100 }
+        if (this.filters.search) params.search = this.filters.search
+        if (this.filters.type !== null) params.type = this.filters.type
+
+        const { data } = await axios.get('/users/search', { params, headers: { Authorization: `Bearer ${token}` } })
+
+        if (data && data.data) this.users = data.data
+        else this.users = []
+      } catch (error) {
+        console.error('Erro ao buscar usuários:', error)
+      } finally {
+        this.tableLoading = false
+      }
+    },
+
+    openCreateUserModal () {
+      this.createUserForm = { name: '', cpf: '', email: '', phone: '', password: '', role: 1, department: null }
+      this.$bvModal.show('create-user-modal')
+    },
+
+    async createUser () {
+      this.createLoading = true
+      try {
+        const token = localStorage.getItem('token')
+        const payload = {
+          Nome: this.createUserForm.name,
+          Email: this.createUserForm.email,
+          Senha: this.createUserForm.password,
+          Cpf: this.createUserForm.cpf,
+          Type: this.createUserForm.role,
+          Department: this.createUserForm.department,
+          FoneNumber: this.createUserForm.phone
+        }
+        await axios.post('/auth/registrar', payload, { headers: { Authorization: `Bearer ${token}` } })
+        this.$toast.success('Usuário criado com sucesso!')
+        this.$bvModal.hide('create-user-modal')
+        this.fetchUsers()
+      } catch (error) {
+        const msg = error.response?.data?.mensagem || 'Erro ao criar usuário.'
+        this.$toast.error(msg)
+      } finally {
+        this.createLoading = false
+      }
+    },
+
+    getRoleName (role) {
+      if (role === 2 || role === 'CityHall' || role === 'Prefeitura') return 'Prefeitura'
+      return 'Cidadão'
+    },
+    getRoleBadgeClass (role) {
+      if (role === 2 || role === 'CityHall' || role === 'Prefeitura') return 'badge-light-primary'
+      return 'badge-light-secondary'
+    },
+    formatPhone (phone) {
+      if (!phone) return ''
+      return phone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
+    },
+
+    async fetchNotifications () {
+      try {
+        const token = localStorage.getItem('token')
+        const { data } = await axios.get('/notifications', { headers: { Authorization: `Bearer ${token}` } })
+        this.notifications = data
+      } catch (error) { console.error(error) }
+    },
+    async markNotificationsAsRead () {
+      if (this.unreadCount === 0) return
+      try {
+        const token = localStorage.getItem('token')
+        await axios.post('/notifications/read-all', {}, { headers: { Authorization: `Bearer ${token}` } })
+        this.notifications.forEach(n => { n.isRead = true })
+      } catch (error) { console.error(error) }
+    },
+    async openProfileModal () {
+      try {
+        const userDataStr = localStorage.getItem('userData')
+        if (!userDataStr) { this.logout(); return }
+        const userData = JSON.parse(userDataStr)
+        const userId = userData.id || userData.Id
+        const token = localStorage.getItem('token')
+        const { data } = await axios.get(`/users/${userId}`, { headers: { Authorization: `Bearer ${token}` } })
+        this.profileForm.name = data.name
+        this.profileForm.foneNumber = data.foneNumber || ''
+        this.userCpf = data.cpf
+        this.userEmail = data.email
+        this.$bvModal.show('profile-modal')
+      } catch (error) { this.$toast.error('Erro ao carregar perfil.') }
+    },
+    async updateProfile () {
+      this.profileLoading = true
+      try {
+        const token = localStorage.getItem('token')
+        const payload = { Nome: this.profileForm.name, FoneNumber: this.profileForm.foneNumber }
+        await axios.put('/users/update', payload, { headers: { Authorization: `Bearer ${token}` } })
+        this.$toast.success('Perfil atualizado!')
+        this.userName = this.profileForm.name
+        const userData = JSON.parse(localStorage.getItem('userData'))
+        userData.nome = this.profileForm.name
+        localStorage.setItem('userData', JSON.stringify(userData))
+        this.$bvModal.hide('profile-modal')
+      } catch (error) { this.$toast.error('Erro ao atualizar.') } finally { this.profileLoading = false }
+    },
+    goToNewComplaint () {
+      if (this.isLoggedIn) this.$router.push({ name: 'register-complaint' })
+      else {
+        this.$swal({
+          title: 'Identifique-se',
+          text: 'Para registrar uma reclamação oficial, você precisa entrar ou se cadastrar.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Ok',
+          cancelButtonText: 'Cancelar'
+        })
+      }
+    },
+    logout () {
+      localStorage.removeItem('token')
+      localStorage.removeItem('userData')
+      this.isLoggedIn = false
+      this.$toast.info('Até logo! Saindo...')
+      setTimeout(() => { window.location.reload() }, 500)
+    },
+    formatDate (date) {
+      if (!date) return ''
+      const d = new Date(date)
+      return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')} às ${d.getHours()}:${d.getMinutes()}`
+    }
   }
 }
 </script>
 
 <style scoped>
-/* Color Palette */
-:root {
-  --blue-primary: #2563EB;
-  --blue-dark: #1E40AF;
-  --blue-darker: #1E3A8A;
-  --gold: #F59E0B;
-  --gold-dark: #D97706;
-  --success: #10B981;
-  --warning: #F59E0B;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+.modern-ui {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #f8f9fa;
+  min-height: 100vh;
 }
 
-.text-gold { color: var(--gold) !important; }
-
-/* Navbar */
-.sabara-navbar {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
-  padding: 1.2rem 0;
+.custom-navbar {
+  min-height: 80px;
+  background-image: linear-gradient(70deg, #570303, #B11313);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.brand-name {
-  color: var(--blue-primary);
-  font-size: 1.6rem;
-  font-weight: 800;
+.brand-logo {
+  font-size: 1.5rem;
   letter-spacing: -0.5px;
 }
 
-.nav-link-text {
-  color: #1F2937;
+.user-table th {
+  border-top: none !important;
+  font-size: 0.75rem;
   font-weight: 600;
-  transition: all 0.3s;
-  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #b9b9c3;
+  padding: 1.2rem 1rem;
+  background-color: #ffffff;
 }
 
-.nav-link-text:hover {
-  color: var(--blue-primary);
+.user-table td {
+  padding: 1rem;
+  vertical-align: middle;
+  font-size: 0.9rem;
+  color: #6e6b7b;
 }
 
-.btn-gold {
-  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
-  border: none;
-  color: white;
-  font-weight: 700;
-  border-radius: 50px;
-  transition: all 0.3s;
-  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+.user-table thead th:focus {
+  outline: none;
 }
 
-.btn-gold:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
-}
-
-/* Hero Section */
-.hero-section {
-  min-height: 100vh;
-  background: linear-gradient(135deg, var(--blue-darker) 0%, var(--blue-dark) 50%, var(--blue-primary) 100%);
+.search-wrapper {
   position: relative;
-  overflow: hidden;
+  width: 100%;
 }
 
-.hero-pattern {
+.search-icon-input {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image:
-    radial-gradient(circle at 20% 30%, rgba(245, 158, 11, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 80% 70%, rgba(37, 99, 235, 0.2) 0%, transparent 50%),
-    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 255, 255, 0.03) 2px, rgba(255, 255, 255, 0.03) 4px);
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
 }
 
-.hero-content {
-  position: relative;
-  z-index: 2;
+.input-clean {
+  border-radius: 20px;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  padding-left: 40px;
+  height: 45px;
+  transition: all 0.2s ease;
 }
 
-.badge-hero {
-  display: inline-flex;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 0.75rem 1.5rem;
-  border-radius: 50px;
-  color: white;
-  font-weight: 600;
-  font-size: 0.85rem;
-  letter-spacing: 0.3px;
+.input-clean:focus {
+  background-color: #ffffff;
+  border-color: #8B0000;
+  box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.12);
 }
 
-.hero-title {
-  font-size: 4rem;
-  font-weight: 900;
-  line-height: 1.1;
-  letter-spacing: -2px;
-  color: white;
+.input-filter-select {
+  height: 45px;
+  border-radius: 8px;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  padding: 0 14px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #495057;
+  transition: all 0.2s ease;
 }
 
-.text-gradient {
-  background: linear-gradient(135deg, var(--gold) 0%, #FCD34D 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.input-filter-select:focus {
+  border-color: #8B0000;
+  box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.12);
 }
 
-.hero-subtitle {
-  font-size: 1.25rem;
-  color: rgba(255, 255, 255, 0.85);
-  line-height: 1.7;
-  max-width: 540px;
+.input-filter-select.custom-select {
+  background-image: none;
+}
+
+.input-modern {
+  border: 2px solid #eee;
+  border-radius: 8px;
+  padding: 10px 15px;
+  height: auto;
+  transition: border-color 0.2s;
+}
+
+.input-modern:focus {
+  border-color: #8B0000;
+  box-shadow: none;
+}
+
+.input-disabled {
+  background-color: #f5f5f5 !important;
+  color: #6c757d !important;
+  border-color: #eee !important;
+  cursor: default !important;
+  pointer-events: none;
+}
+
+.btn-cta-red {
+  background-color: #8B0000 !important;
+  border-color: #8B0000 !important;
+  color: white !important;
+}
+
+.btn-cta-red:hover {
+  background-color: #a01010 !important;
+  border-color: #a01010 !important;
+}
+
+.btn-semi-rounded {
+  border-radius: 8px !important;
 }
 
 .gap-3 {
   gap: 1rem;
 }
 
-.btn-hero-primary {
-  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
-  border: none;
-  color: white;
-  font-weight: 700;
-  border-radius: 50px;
-  transition: all 0.3s;
-  box-shadow: 0 10px 30px rgba(245, 158, 11, 0.4);
-}
-
-.btn-hero-primary:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 15px 40px rgba(245, 158, 11, 0.5);
-}
-
-.btn-hero-secondary {
-  background: transparent;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  color: white;
-  font-weight: 700;
-  border-radius: 50px;
-  transition: all 0.3s;
-  backdrop-filter: blur(10px);
-}
-
-.btn-hero-secondary:hover {
-  background: white;
-  color: var(--blue-primary);
-  border-color: white;
-  transform: translateY(-3px);
-}
-
-.hero-badges {
-  display: flex;
-  gap: 2rem;
-  flex-wrap: wrap;
-}
-
-.badge-item {
-  display: flex;
-  align-items: center;
+.gap-2 {
   gap: 0.5rem;
-  color: white;
+}
+
+.bg-light-sabara {
+  background-color: #fff0f0;
+}
+
+.text-sabara {
+  color: #8B0000;
+}
+
+.bg-sabara {
+  background-color: #8B0000;
+}
+
+.badge-light-primary {
+  background-color: #e3f2fd;
+  color: #1565c0;
   font-weight: 600;
-  font-size: 0.9rem;
+  border-radius: 6px;
 }
 
-/* Hero Visual */
-.hero-visual {
-  position: relative;
-  height: 500px;
+.badge-light-secondary {
+  background-color: #f3f3f3;
+  color: #555;
+  font-weight: 600;
+  border-radius: 6px;
 }
 
-.floating-element {
+.notification-menu {
+  width: 380px;
+  max-width: 90vw;
+  padding: 0;
+  overflow: hidden;
+}
+
+.notification-list-container {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.notification-badge {
   position: absolute;
-  animation: float 6s ease-in-out infinite;
+  top: -5px;
+  right: -5px;
+  background-color: #ea5455;
+  color: white;
+  font-size: 0.65rem;
+  font-weight: bold;
+  padding: 2px 5px;
+  min-width: 18px;
+  text-align: center;
+  border-radius: 50%;
+  border: 2px solid #343a40;
 }
 
-.elem-1 {
-  top: 10%;
-  left: 5%;
-  animation-delay: 0s;
+::v-deep .dropdown-item:active {
+  background-color: #f8f9fa !important;
+  color: #212529 !important;
 }
 
-.elem-2 {
-  top: 45%;
-  right: 10%;
-  animation-delay: 2s;
+::v-deep .dropdown-item:hover {
+  background-color: #f1f1f1 !important;
+  color: #212529 !important;
 }
 
-.elem-3 {
-  bottom: 15%;
-  left: 15%;
-  animation-delay: 4s;
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-25px) rotate(2deg);
-  }
-}
-
-.glass-card {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
-  padding: 1.5rem;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  min-width: 280px;
-}
-
-.status-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
+.hero {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("../../../public/Bairro-Pompeu.jpg");
+  background-size: cover;
+  background-position: center;
+  min-height: 540px;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-}
-
-.bg-gradient-success {
-  background: linear-gradient(135deg, #10B981, #059669);
-  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
-}
-
-.bg-gradient-warning {
-  background: linear-gradient(135deg, #F59E0B, #D97706);
-  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
-}
-
-.bg-gradient-blue {
-  background: linear-gradient(135deg, #3B82F6, #2563EB);
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
-}
-
-.status-label {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 0.25rem;
-}
-
-.status-title {
-  color: white;
-  font-size: 1rem;
-  font-weight: 700;
-}
-
-.hero-circle {
-  position: absolute;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.15), transparent);
-  animation: pulse 8s ease-in-out infinite;
-}
-
-.circle-1 {
-  width: 300px;
-  height: 300px;
-  top: -50px;
-  right: -50px;
-}
-
-.circle-2 {
-  width: 200px;
-  height: 200px;
-  bottom: 50px;
-  left: -30px;
-  animation-delay: 2s;
-}
-
-.circle-3 {
-  width: 150px;
-  height: 150px;
-  top: 50%;
-  right: 20%;
-  animation-delay: 4s;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 0.3;
-  }
-  50% {
-    transform: scale(1.1);
-    opacity: 0.5;
-  }
-}
-
-/* Features Section */
-.features-section {
-  padding: 120px 0;
-  background: linear-gradient(180deg, #F9FAFB 0%, #FFFFFF 100%);
-}
-
-.section-badge {
-  display: inline-flex;
-  align-items: center;
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(245, 158, 11, 0.1));
-  border: 1px solid rgba(37, 99, 235, 0.2);
-  padding: 0.6rem 1.5rem;
-  border-radius: 50px;
-  color: var(--blue-primary);
-  font-weight: 700;
-  font-size: 0.8rem;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-.section-badge-light {
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
-}
-
-.section-title {
-  font-size: 3rem;
-  font-weight: 900;
-  color: #111827;
-  letter-spacing: -1px;
-}
-
-.section-subtitle {
-  font-size: 1.15rem;
-  color: #6B7280;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.feature-card {
-  background: white;
-  border-radius: 24px;
-  padding: 2.5rem 2rem;
-  height: 100%;
   position: relative;
-  overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 2px solid transparent;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
 }
 
-.feature-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 5px;
-  background: linear-gradient(90deg, var(--blue-primary), var(--gold));
-  transform: scaleX(0);
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+.content-overlay {
+  z-index: 2;
 }
 
-.feature-card:hover {
-  transform: translateY(-12px);
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12);
-  border-color: rgba(37, 99, 235, 0.1);
+.main-content-wrapper {
+  margin-top: -30px;
+  position: relative;
+  z-index: 3;
+  background-color: #272424;
+  padding-bottom: 5rem;
 }
 
-.feature-card:hover::before {
-  transform: scaleX(1);
+.shadow-card {
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08) !important;
 }
 
-.feature-card.featured {
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(245, 158, 11, 0.05));
-  border: 2px solid var(--gold);
-  box-shadow: 0 8px 30px rgba(245, 158, 11, 0.2);
+.rounded-xl {
+  border-radius: 16px !important;
 }
 
-.popular-badge {
-  position: absolute;
-  top: 1.5rem;
-  right: 1.5rem;
-  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 50px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.header-line {
+  flex-grow: 1;
+  height: 2px;
+  background: linear-gradient(90deg, #8B0000 0%, transparent 100%);
+  opacity: 0.2;
+}
+
+.close-btn-wrapper {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.close-btn-wrapper:hover {
+  background-color: #f1f3f5;
+  transform: rotate(90deg);
+}
+
+.close-btn-wrapper:hover svg {
+  color: #dc3545 !important;
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }
 </style>

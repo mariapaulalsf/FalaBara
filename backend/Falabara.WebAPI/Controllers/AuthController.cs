@@ -67,9 +67,12 @@ namespace Falabara.WebAPI.Controllers
 
                 return Ok(new { 
                     token = token, 
+                    id = user.Id,     
                     nome = user.Name, 
                     email = user.Email,
-                    tipo = user.Type 
+                    cpf = user.Cpf,   
+                    tipo = user.Type,
+                    role = user.Type   
                 });
             }
             catch (Exception ex)
