@@ -87,7 +87,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.Configure<FormOptions>(o =>
 {
     o.ValueLengthLimit = int.MaxValue;
-    o.MultipartBodyLengthLimit = 200 * 1024 * 1024; // 200 MB
+    o.MultipartBodyLengthLimit = 200 * 1024 * 1024; 
     o.MemoryBufferThreshold = int.MaxValue;
 });
 
