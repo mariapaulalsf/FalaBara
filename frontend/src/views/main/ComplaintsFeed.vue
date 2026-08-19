@@ -217,7 +217,7 @@ export default {
         'Centro', 'Nações Unidas', 'Siderúrgica', 'Alvorada', 'General Carneiro',
         'Ana Lúcia', 'Santa Inês', 'Rosário', 'Esplanada', 'Fátima', 'Cabral',
         'Vila Real', 'Nova Vista', 'Santo Antônio', 'Rosário II', 'Roça Grande',
-        'Itacolomi', 'Morada da Serra', 'Vila Francisco de Moura', 'Vila Rica', 'Pompéu', 'Ravenna'
+        'Itacolomi', 'Morada da Serra', 'Vila Francisco de Moura', 'Vila Rica', 'Pompéu', 'Ravenna', 'Santarem'
       ].sort(),
 
       categoryOptions: [{ value: 0, text: 'Saúde' }, { value: 1, text: 'Infraestrutura' }, { value: 2, text: 'Trânsito' }, { value: 3, text: 'Iluminação' }, { value: 4, text: 'Limpeza' }, { value: 5, text: 'Segurança' }, { value: 6, text: 'Educação' }, { value: 7, text: 'Meio Ambiente' }, { value: 8, text: 'Outros' }],
